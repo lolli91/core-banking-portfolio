@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Core Banking Application Solutions</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; }
+        .hero { background: linear-gradient(rgba(0,31,63,0.8), rgba(0,31,63,0.8)), url('https://via.placeholder.com/1920x1080/001F3F/FFFFFF?text=Fintech+Background'); background-size: cover; color: white; }
+        .feature-icon { font-size: 2rem; color: #007BFF; }
+        .section-bg { background-color: #f8f9fa; }
+        .btn-primary { background-color: #007BFF; border: none; }
+        .navbar { background-color: #001F3F; }
+        .badge { font-size: 0.9rem; }
+        .tier-badge { font-size: 1rem; padding: 0.5em 1em; }
+        .navbar-brand img { height: 40px; margin-right: 10px; }
+        .navbar-brand span { font-weight: bold; font-size: 1.3rem; }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar with Logo -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="{{ url_for('static', filename='logo.png') }}"
+                     onerror="this.onerror=null; this.src='{{ url_for('static', filename='Logo.png') }}';"
+                     alt="Ragosa Tech Logo"
+                     class="me-2">
+                <span>Ragosa Tech</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#trust">Trust & Performance</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#ideal">Ideal For</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero min-vh-100 d-flex align-items-center text-center">
+        <div class="container">
+            <h1 class="display-4 fw-bold">🔹 CORE BANKING APPLICATION SOLUTIONS 🔹</h1>
+            <p class="lead">Secure • Scalable • Compliant</p>
+            <h2>Powering Real-World Financial Operations</h2>
+            <p class="mt-4">I develop end-to-end core banking applications built to support the daily operational needs of financial institutions. My solutions are designed for reliability, efficiency, and growth—ready for real banking environments, not just demos.</p>
+            <a href="#contact" class="btn btn-primary btn-lg mt-3">Get in Touch</a>
+        </div>
+    </section>
+
+    <!-- Key Features -->
+    <section id="features" class="py-5 section-bg">
+        <div class="container">
+            <h2 class="text-center mb-5">🔧 Key Features</h2>
+            <div class="row g-4">
+                <!-- Row 1 -->
+                <div class="col-md-4 mb-4">
+                    <div class="text-center"><i class="fas fa-users feature-icon"></i></div>
+                    <h5>✔ Intelligent Customer Onboarding & Auto Tiering</h5>
+                    <small>Full KYC with automatic tier assignment (Tier 1 → Tier 2 → Tier 3) based on BVN/NIN, Proof of Address, and Next of Kin</small>
+                    <div class="mt-3">
+                        <span class="badge tier-badge bg-secondary">Tier 1</span>
+                        <span class="badge tier-badge bg-warning">Tier 2</span>
+                        <span class="badge tier-badge bg-success">Tier 3</span>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="text-center"><i class="fas fa-wallet feature-icon"></i></div>
+                    <h5>✔ Deposits & Account Management</h5>
+                    <small>Savings/current accounts, dormancy controls, multi-branch support</small>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="text-center"><i class="fas fa-hand-holding-usd feature-icon"></i></div>
+                    <h5>✔ Loans & Repayment Processing</h5>
+                    <small>Individual/group loans, disbursement, automated repayments, overdue tracking</small>
+                </div>
+
+                <!-- Row 2 -->
+                <div class="col-md-4 mb-4">
+                    <div class="text-center"><i class="fas fa-percentage feature-icon"></i></div>
+                    <h5>✔ Interest Processing & Capitalization</h5>
+                    <small>Automated/manual interest capitalization with configurable rates</small>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="text-center"><i class="fas fa-clock feature-icon"></i></div>
+                    <h5>✔ End-of-Day (EOD) Management</h5>
+                    <small>Batch processing, reconciliation, and secure day-close controls</small>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="text-center"><i class="fas fa-user-shield feature-icon"></i></div>
+                    <h5>✔ Maker-Checker Workflow & Role Management</h5>
+                    <small>Granular permissions, dual approval, full audit trail</small>
+                </div>
+
+                <!-- Row 3 -->
+                <div class="col-md-4 mb-4">
+                    <div class="text-center"><i class="fas fa-exchange-alt feature-icon"></i></div>
+                    <h5>✔ Teller & Vault Management</h5>
+                    <small>Till creation, vault-teller transfers, cash balancing</small>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="text-center"><i class="fas fa-file-invoice-dollar feature-icon"></i></div>
+                    <h5>✔ General Ledger & Accounting</h5>
+                    <small>Journal entries, trial balance, zone-level reporting</small>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="text-center"><i class="fas fa-bell feature-icon"></i></div>
+                    <h5>✔ SMS & Email Alerts</h5>
+                    <small>Configurable notifications for transactions, overdues, and events</small>
+                </div>
+
+                <!-- Row 4 -->
+                <div class="col-md-4 mb-4">
+                    <div class="text-center"><i class="fas fa-chart-bar feature-icon"></i></div>
+                    <h5>✔ Advanced Reporting & Analytics</h5>
+                    <small>Overdue reports, statements, repayment schedules, audit logs</small>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="text-center"><i class="fas fa-lock feature-icon"></i></div>
+                    <h5>✔ Enterprise Security & Compliance</h5>
+                    <small>IP whitelisting, login history, session timeout, 2FA-ready</small>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="text-center"><i class="fas fa-mobile-alt feature-icon"></i></div>
+                    <h5>✔ Fully Responsive & Modern UI</h5>
+                    <small>Desktop + mobile optimized, multiple themes, quick actions</small>
+                </div>
+            </div>
+
+            <!-- System Highlights -->
+            <div class="text-center mt-5">
+                <span class="badge bg-primary mx-1">Multi-Branch & Zone Support</span>
+                <span class="badge bg-success mx-1">Group Lending</span>
+                <span class="badge bg-info mx-1">Online Customer Onboarding</span>
+                <span class="badge bg-warning mx-1">Custom Themes</span>
+                <span class="badge bg-danger mx-1">Real-time Audit Trail</span>
+                <span class="badge bg-dark mx-1">Automatic KYC Tiering</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Built for Trust -->
+    <section id="trust" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">🔐 Built for Trust & Performance</h2>
+            <div class="row text-center">
+                <div class="col-md-3"><h5>✔ High Security Standards</h5></div>
+                <div class="col-md-3"><h5>✔ Optimized Performance</h5></div>
+                <div class="col-md-3"><h5>✔ Regulatory & Compliance-Ready</h5></div>
+                <div class="col-md-3"><h5>✔ Scalable Architecture</h5></div>
+            </div>
+            <!-- Optional: Add dashboard mockups -->
+            <div class="row mt-5">
+                <div class="col-md-6"><img src="static/img/dashboard.jpg" class="img-fluid rounded shadow" alt="Dashboard 1"></div>
+                <div class="col-md-6"><img src="static/img/dashboard2.jpg" class="img-fluid rounded shadow" alt="Dashboard 2"></div>
+                <div class="col-md-6"><img src="static/img/dashboard3.jpg" class="img-fluid rounded shadow" alt="Dashboard 3"></div>
+                <div class="col-md-6"><img src="static/img/report.jpg" class="img-fluid rounded shadow" alt="Dashboard 2"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ideal For -->
+    <section id="ideal" class="py-5 section-bg">
+        <div class="container">
+            <h2 class="text-center mb-5">🏦 Ideal For</h2>
+            <ul class="list-group list-group-flush text-center">
+                <li class="list-group-item">• Microfinance Banks</li>
+                <li class="list-group-item">• Cooperative Societies</li>
+                <li class="list-group-item">• Fintech Startups</li>
+                <li class="list-group-item">• Financial Institutions</li>
+            </ul>
+            <h3 class="text-center mt-5">💡 Why Choose This Solution?</h3>
+            <p class="text-center lead">Because it is built by a technologist who understands both banking operations and software architecture, ensuring systems that work efficiently in real financial environments.</p>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5">Get in Touch</h2>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" novalidate>
+                        {{ form.hidden_tag() }}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                {{ form.name.label(class="form-label") }}
+                                {{ form.name(class="form-control", placeholder="Your Name") }}
+                                {% if form.name.errors %}
+                                    <div class="text-danger small">{{ form.name.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.company.label(class="form-label") }}
+                                {{ form.company(class="form-control", placeholder="Your Company (Optional)") }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.email.label(class="form-label") }}
+                                {{ form.email(class="form-control", placeholder="your@email.com") }}
+                                {% if form.email.errors %}
+                                    <div class="text-danger small">{{ form.email.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.phone.label(class="form-label") }}
+                                {{ form.phone(class="form-control", placeholder="+234... (Optional)") }}
+                            </div>
+                            <div class="col-12">
+                                {{ form.message.label(class="form-label") }}
+                                {{ form.message(class="form-control", rows=6, placeholder="Tell me about your project or requirements...") }}
+                                {% if form.message.errors %}
+                                    <div class="text-danger small">{{ form.message.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-12 text-center">
+                                {{ form.submit(class="btn btn-primary btn-lg px-5") }}
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <p class="mb-1">📞 <strong>+2348138879938</strong></p>
+                        <p>📧 <a href="mailto:helpdesk.ragosa.tech@gmail.com">helpdesk.ragosa.tech@gmail.com</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-dark text-white text-center py-4">
+        <p>&copy; 2025 Ragosa Tech. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
