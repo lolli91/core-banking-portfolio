@@ -8,8 +8,10 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your-super-secret-key-change-this-in-production'  # Change this!
+app = Flask(__name__, 
+            template_folder='../templates',   # <-- Go up one level to find templates
+            static_folder='../static')       # <-- Same for static files (logo, images)
+app.config['SECRET_KEY'] = 'Lollipop91$'  # Change this!
 
 # Email configuration - Use Gmail App Password (recommended)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
