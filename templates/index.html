@@ -158,12 +158,20 @@
                 <div class="col-md-3"><h5>✔ Regulatory & Compliance-Ready</h5></div>
                 <div class="col-md-3"><h5>✔ Scalable Architecture</h5></div>
             </div>
-            <!-- Optional: Add dashboard mockups -->
+            <!-- Dashboard Mockups -->
             <div class="row mt-5">
-                <div class="col-md-6"><img src="static/dashboard.jpg" class="img-fluid rounded shadow" alt="Dashboard 1"></div>
-                <div class="col-md-6"><img src="static/dashboard2.jpg" class="img-fluid rounded shadow" alt="Dashboard 2"></div>
-                <div class="col-md-6"><img src="static/dashboard3.jpg" class="img-fluid rounded shadow" alt="Dashboard 3"></div>
-                <div class="col-md-6"><img src="static/report.jpg" class="img-fluid rounded shadow" alt="Dashboard 2"></div>
+                <div class="col-md-6 mb-4">
+                    <img src="{{ url_for('static', filename='dashboard.jpg') }}" class="img-fluid rounded shadow" alt="Dashboard 1">
+                </div>
+                <div class="col-md-6 mb-4">
+                    <img src="{{ url_for('static', filename='dashboard2.jpg') }}" class="img-fluid rounded shadow" alt="Dashboard 2">
+                </div>
+                <div class="col-md-6 mb-4">
+                    <img src="{{ url_for('static', filename='dashboard3.jpg') }}" class="img-fluid rounded shadow" alt="Dashboard 3">
+                </div>
+                <div class="col-md-6 mb-4">
+                    <img src="{{ url_for('static', filename='report.jpg') }}" class="img-fluid rounded shadow" alt="Reports">
+                </div>
             </div>
         </div>
     </section>
