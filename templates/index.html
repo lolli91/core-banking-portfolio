@@ -18,20 +18,22 @@
             opacity: 1;
         }
 
-        /* Hero background visible during loading */
+        /* Hero background visible during loading - using a modern fintech abstract */
         #page-loader {
-            background: linear-gradient(rgba(0,31,63,0.8), rgba(0,31,63,0.8)), 
-                        url('https://via.placeholder.com/1920x1080/001F3F/FFFFFF?text=Fintech+Background');
+            background: linear-gradient(rgba(0,31,63,0.9), rgba(0,31,63,0.9)), 
+                        url('https://static.vecteezy.com/system/resources/previews/010/379/158/non_2x/abstract-fintech-finance-technology-applied-in-the-financial-business-on-a-modern-blue-background-concept-phone-and-smart-city-and-icons-fintech-business-futuristic-vector.jpg');
             background-size: cover;
             background-position: center;
         }
 
         .hero { 
-            background: linear-gradient(rgba(0,31,63,0.8), rgba(0,31,63,0.8)), 
-                        url('https://via.placeholder.com/1920x1080/001F3F/FFFFFF?text=Fintech+Background'); 
+            background: linear-gradient(rgba(0,31,63,0.9), rgba(0,31,63,0.9)), 
+                        url('https://static.vecteezy.com/system/resources/previews/010/379/158/non_2x/abstract-fintech-finance-technology-applied-in-the-financial-business-on-a-modern-blue-background-concept-phone-and-smart-city-and-icons-fintech-business-futuristic-vector.jpg'); 
             background-size: cover; 
+            background-position: center;
             color: white; 
         }
+
         .feature-icon { font-size: 2rem; color: #007BFF; }
         .section-bg { background-color: #f8f9fa; }
         .btn-primary { background-color: #007BFF; border: none; }
@@ -46,41 +48,63 @@
             opacity: 0;
             transform: translateY(30px) scale(0.95);
             transition: opacity 0.8s ease, transform 0.8s ease;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
         }
         .dashboard-img.animated {
             opacity: 1;
             transform: translateY(0) scale(1);
         }
 
-        /* About & Certifications Section */
-        #about-certifications {
-            background-color: #001F3F;
+        /* About & Skills & Certifications Section */
+        #about-section {
+            background: linear-gradient(135deg, #001F3F, #003366);
             color: white;
+            padding-top: 6rem;
+            padding-bottom: 6rem;
         }
-        #about-certifications a {
+        #about-section a {
             color: #007BFF;
             text-decoration: underline;
         }
-        #about-certifications a:hover {
+        #about-section a:hover {
             color: #0056b3;
         }
+        .profile-img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border: 5px solid #007BFF;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+        .skill-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .skill-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,123,255,0.3);
+        }
+        .skill-icon {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+        }
         .social-links a {
-            font-size: 1.5rem;
-            margin: 0 10px;
+            font-size: 2rem;
+            margin: 0 15px;
             color: white;
+            transition: color 0.3s ease, transform 0.3s ease;
         }
         .social-links a:hover {
             color: #007BFF;
-        }
-        .cert-list {
-            list-style: none;
-            padding-left: 0;
+            transform: scale(1.2);
         }
         .cert-list li {
-            margin-bottom: 1rem;
-            padding-left: 2rem;
+            margin-bottom: 1.2rem;
+            padding-left: 2.5rem;
             position: relative;
         }
         .cert-list li::before {
@@ -88,6 +112,7 @@
             font-family: "Font Awesome 6 Free";
             font-weight: 900;
             color: #007BFF;
+            font-size: 1.5rem;
             position: absolute;
             left: 0;
         }
@@ -97,13 +122,13 @@
 
     <!-- Loading Spinner Overlay -->
     <div id="page-loader" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index: 9999; transition: opacity 0.7s ease;">
-        <div class="spinner-border text-primary" role="status" style="width: 4rem; height: 4rem;">
+        <div class="spinner-border text-primary" role="status" style="width: 5rem; height: 5rem;">
             <span class="visually-hidden">Loading...</span>
         </div>
     </div>
 
     <!-- Navbar with Logo -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow-lg">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="#">
                 <img src="{{ url_for('static', filename='logo.png') }}"
@@ -122,7 +147,7 @@
                     <li class="nav-item"><a class="nav-link" href="#trust">Trust & Performance</a></li>
                     <li class="nav-item"><a class="nav-link" href="#ideal">Ideal For</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#about-certifications">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about-section">About</a></li>
                 </ul>
             </div>
         </div>
@@ -131,20 +156,19 @@
     <!-- Hero Section -->
     <section id="home" class="hero min-vh-100 d-flex align-items-center text-center">
         <div class="container">
-            <h1 class="display-4 fw-bold">🔹 CORE BANKING SOLUTIONS 🔹</h1>
-            <p class="lead">Secure • Scalable • Compliant</p>
-            <h2>Powering Real-World Financial Operations</h2>
-            <p class="mt-4">I develop end-to-end core banking applications built to support the daily operational needs of financial institutions. My solutions are designed for reliability, efficiency, and growth—ready for real banking environments, not just demos.</p>
-            <a href="#contact" class="btn btn-primary btn-lg mt-3">Get in Touch</a>
+            <h1 class="display-3 fw-bold mb-4">🔹 CORE BANKING SOLUTIONS 🔹</h1>
+            <p class="lead mb-3">Secure • Scalable • Compliant</p>
+            <h2 class="display-5 mb-4">Powering Real-World Financial Operations</h2>
+            <p class="fs-5 mb-5">I develop end-to-end core banking applications built to support the daily operational needs of financial institutions. My solutions are designed for reliability, efficiency, and growth—ready for real banking environments, not just demos.</p>
+            <a href="#contact" class="btn btn-primary btn-lg px-5 py-3 shadow">Get in Touch</a>
         </div>
     </section>
 
     <!-- Key Features -->
     <section id="features" class="py-5 section-bg">
         <div class="container">
-            <h2 class="text-center mb-5">🔧 Key Features</h2>
+            <h2 class="text-center mb-5 display-5">🔧 Key Features</h2>
             <div class="row g-4">
-                <!-- Row 1 -->
                 <div class="col-md-4 mb-4 text-center">
                     <div class="text-center"><i class="fas fa-users feature-icon"></i></div>
                     <h5>✔ Intelligent Customer Onboarding & Auto Tiering</h5>
@@ -165,8 +189,6 @@
                     <h5>✔ Loans & Repayment Processing</h5>
                     <small>Individual/group loans, disbursement, automated repayments, overdue tracking</small>
                 </div>
-
-                <!-- Row 2 -->
                 <div class="col-md-4 mb-4 text-center">
                     <div class="text-center"><i class="fas fa-percentage feature-icon"></i></div>
                     <h5>✔ Interest Processing & Capitalization</h5>
@@ -182,8 +204,6 @@
                     <h5>✔ Maker-Checker Workflow & Role Management</h5>
                     <small>Granular permissions, dual approval, full audit trail</small>
                 </div>
-
-                <!-- Row 3 -->
                 <div class="col-md-4 mb-4 text-center">
                     <div class="text-center"><i class="fas fa-exchange-alt feature-icon"></i></div>
                     <h5>✔ Teller & Vault Management</h5>
@@ -199,8 +219,6 @@
                     <h5>✔ SMS & Email Alerts</h5>
                     <small>Configurable notifications for transactions, overdues, and events</small>
                 </div>
-
-                <!-- Row 4 -->
                 <div class="col-md-4 mb-4 text-center">
                     <div class="text-center"><i class="fas fa-chart-bar feature-icon"></i></div>
                     <h5>✔ Advanced Reporting & Analytics</h5>
@@ -218,7 +236,6 @@
                 </div>
             </div>
 
-            <!-- System Highlights -->
             <div class="text-center mt-5">
                 <span class="badge bg-primary mx-1">Multi-Branch & Zone Support</span>
                 <span class="badge bg-success mx-1">Group Lending</span>
@@ -233,26 +250,25 @@
     <!-- Built for Trust -->
     <section id="trust" class="py-5">
         <div class="container">
-            <h2 class="text-center mb-5">🔐 Built for Trust & Performance</h2>
-            <div class="row text-center mb-5">
+            <h2 class="text-center mb-5 display-5">🔐 Built for Trust & Performance</h2>
+            <div class="row text-center mb-5 g-4">
                 <div class="col-md-3"><h5>✔ High Security Standards</h5></div>
                 <div class="col-md-3"><h5>✔ Optimized Performance</h5></div>
                 <div class="col-md-3"><h5>✔ Regulatory & Compliance-Ready</h5></div>
                 <div class="col-md-3"><h5>✔ Scalable Architecture</h5></div>
             </div>
-            <!-- Dashboard Images with Animation -->
-            <div class="row mt-5">
+            <div class="row mt-5 g-4">
                 <div class="col-md-6 mb-4">
-                    <img src="{{ url_for('static', filename='dashboard.jpg') }}" class="img-fluid dashboard-img shadow" alt="Dashboard 1">
+                    <img src="{{ url_for('static', filename='dashboard.jpg') }}" class="img-fluid dashboard-img shadow-lg" alt="Dashboard 1">
                 </div>
                 <div class="col-md-6 mb-4">
-                    <img src="{{ url_for('static', filename='dashboard2.jpg') }}" class="img-fluid dashboard-img shadow" alt="Dashboard 2">
+                    <img src="{{ url_for('static', filename='dashboard2.jpg') }}" class="img-fluid dashboard-img shadow-lg" alt="Dashboard 2">
                 </div>
                 <div class="col-md-6 mb-4">
-                    <img src="{{ url_for('static', filename='dashboard3.jpg') }}" class="img-fluid dashboard-img shadow" alt="Dashboard 3">
+                    <img src="{{ url_for('static', filename='dashboard3.jpg') }}" class="img-fluid dashboard-img shadow-lg" alt="Dashboard 3">
                 </div>
                 <div class="col-md-6 mb-4">
-                    <img src="{{ url_for('static', filename='report.jpg') }}" class="img-fluid dashboard-img shadow" alt="Reports">
+                    <img src="{{ url_for('static', filename='report.jpg') }}" class="img-fluid dashboard-img shadow-lg" alt="Reports">
                 </div>
             </div>
         </div>
@@ -261,22 +277,22 @@
     <!-- Ideal For -->
     <section id="ideal" class="py-5 section-bg">
         <div class="container">
-            <h2 class="text-center mb-5">🏦 Ideal For</h2>
-            <ul class="list-group list-group-flush text-center">
-                <li class="list-group-item">• Microfinance Banks</li>
-                <li class="list-group-item">• Cooperative Societies</li>
-                <li class="list-group-item">• Fintech Startups</li>
-                <li class="list-group-item">• Financial Institutions</li>
+            <h2 class="text-center mb-5 display-5">🏦 Ideal For</h2>
+            <ul class="list-group list-group-flush text-center w-75 mx-auto">
+                <li class="list-group-item fs-5">• Microfinance Banks</li>
+                <li class="list-group-item fs-5">• Cooperative Societies</li>
+                <li class="list-group-item fs-5">• Fintech Startups</li>
+                <li class="list-group-item fs-5">• Financial Institutions</li>
             </ul>
-            <h3 class="text-center mt-5">💡 Why Choose This Solution?</h3>
-            <p class="text-center lead">Because it is built by a technologist who understands both banking operations and software architecture, ensuring systems that work efficiently in real financial environments.</p>
+            <h3 class="text-center mt-5 display-6">💡 Why Choose This Solution?</h3>
+            <p class="text-center lead fs-4">Because it is built by a technologist who understands both banking operations and software architecture, ensuring systems that work efficiently in real financial environments.</p>
         </div>
     </section>
 
     <!-- Contact -->
     <section id="contact" class="py-5 bg-light">
         <div class="container">
-            <h2 class="text-center mb-5">Get in Touch</h2>
+            <h2 class="text-center mb-5 display-5">Get in Touch</h2>
             <div class="row justify-content-center">
                 <div class="col-lg-8">
                     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -295,107 +311,138 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 {{ form.name.label(class="form-label") }}
-                                {{ form.name(class="form-control", placeholder="Your Name") }}
+                                {{ form.name(class="form-control form-control-lg", placeholder="Your Name") }}
                                 {% if form.name.errors %}
                                     <div class="text-danger small">{{ form.name.errors[0] }}</div>
                                 {% endif %}
                             </div>
                             <div class="col-md-6">
                                 {{ form.company.label(class="form-label") }}
-                                {{ form.company(class="form-control", placeholder="Your Company (Optional)") }}
+                                {{ form.company(class="form-control form-control-lg", placeholder="Your Company (Optional)") }}
                             </div>
                             <div class="col-md-6">
                                 {{ form.email.label(class="form-label") }}
-                                {{ form.email(class="form-control", placeholder="your@email.com") }}
+                                {{ form.email(class="form-control form-control-lg", placeholder="your@email.com") }}
                                 {% if form.email.errors %}
                                     <div class="text-danger small">{{ form.email.errors[0] }}</div>
                                 {% endif %}
                             </div>
                             <div class="col-md-6">
                                 {{ form.phone.label(class="form-label") }}
-                                {{ form.phone(class="form-control", placeholder="+234... (Optional)") }}
+                                {{ form.phone(class="form-control form-control-lg", placeholder="+234... (Optional)") }}
                             </div>
                             <div class="col-12">
                                 {{ form.message.label(class="form-label") }}
-                                {{ form.message(class="form-control", rows=6, placeholder="Tell me about your project or requirements...") }}
+                                {{ form.message(class="form-control form-control-lg", rows=6, placeholder="Tell me about your project or requirements...") }}
                                 {% if form.message.errors %}
                                     <div class="text-danger small">{{ form.message.errors[0] }}</div>
                                 {% endif %}
                             </div>
                             <div class="col-12 text-center">
-                                {{ form.submit(class="btn btn-primary btn-lg px-5") }}
+                                {{ form.submit(class="btn btn-primary btn-lg px-5 py-3") }}
                             </div>
                         </div>
                     </form>
 
-                    <div class="text-center mt-4">
-                        <p class="mb-1">📞 <strong>+234 813 887 9938</strong></p>
-                        <p>📧 <a href="mailto:helpdesk.ragosa.tech@gmail.com">helpdesk.ragosa.tech@gmail.com</a></p>
+                    <div class="text-center mt-5">
+                        <p class="fs-4 mb-1">📞 <strong>+234 813 887 9938</strong></p>
+                        <p class="fs-4">📧 <a href="mailto:helpdesk.ragosa.tech@gmail.com">helpdesk.ragosa.tech@gmail.com</a></p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- About & Certifications (Moved to bottom) -->
-    <section id="about-certifications" class="py-5">
+    <!-- About, Skills & Certifications -->
+    <section id="about-section">
         <div class="container">
-            <h2 class="text-center mb-5">About Me & Certifications</h2>
+            <h2 class="text-center mb-5 display-4">About Me</h2>
             
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <p class="lead text-center mb-5">
+            <div class="row align-items-center mb-5">
+                <div class="col-md-4 text-center">
+                    <img src="https://media.licdn.com/dms/image/v2/D4E22AQEpqDTQEPFMIQ/feedshare-shrink_800/feedshare-shrink_800/0/1728811749136?e=2147483647&v=beta&t=rrIrjK1clhESwFzwckWCZFSBYtMfGUHSmhMHgZ_R0Nw" 
+                         alt="God'spower Omoruyi" class="img-fluid rounded-circle profile-img shadow-lg">
+                </div>
+                <div class="col-md-8">
+                    <p class="lead fs-4 text-center text-md-start">
                         I am an IT professional with extensive experience in enterprise service support, compliance, internal audit, and data management at LAPO Microfinance Bank Ltd. 
-                        Currently serving as <strong>IT Enterprise Service Support</strong> (Sep 2024 – Present), I maintain computer systems and networks, troubleshoot hardware/software issues, provide end-user support, manage user accounts, and ensure smooth rollout of new applications. 
-                        Previously, as <strong>Compliance and Inspection Manager</strong> (Mar 2023 – Aug 2024), I ensured full KYC documentation capture in the Core Banking System, conducted regular account reviews, implemented regulatory changes, investigated non-compliance, and prepared monthly compliance reports. 
-                        My background also includes advanced Excel usage for financial data analysis (Pivot Tables, formulas), IT management, and strong expertise in network security and audit processes.
-                    </p>
-
-                    <h4 class="text-center mb-4">Certifications</h4>
-                    <ul class="cert-list text-center mx-auto" style="max-width: 700px;">
-                        <li>Accounting Fundamentals – Corporate Finance Institute (Apr 2023)</li>
-                        <li>Get Connected – Cisco Networking Academy (May 2022)</li>
-                        <li>Excel Fundamentals – Formulas for Finance – Corporate Finance Institute (May 2022)</li>
-                        <li>Computer Networking - Wired and Wireless Networks and Protocols – Alison (May 2022)</li>
-                        <li>ISO Management System Audit Techniques and Best Practices – Alison (May 2022)</li>
-                        <li>Understanding Information Control for IT Managers – Alison (Mar 2023)</li>
-                        <li>Working as an IT Support Technician – Alison (Mar 2024)</li>
-                    </ul>
-
-                    <div class="text-center mt-5 social-links">
-                        <a href="https://web.facebook.com/godson.praise.omoruyi" target="_blank" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-                        <a href="https://www.instagram.com/godsonpraise/" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="https://www.linkedin.com/in/godspower-omoruyi-78917b126" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-                    </div>
-
-                    <p class="text-center mt-4">
-                        <strong>Contact:</strong> +234 813 887 9938 | 
-                        <a href="mailto:tnggmusicalcrew@gmail.com">tnggmusicalcrew@gmail.com</a>
+                        Currently serving as <strong>IT Enterprise Service Support</strong> (Sep 2024 – Present), I maintain computer systems and networks, troubleshoot issues, provide end-user support, and ensure smooth application rollouts. 
+                        Previously, as <strong>Compliance and Inspection Manager</strong> (Mar 2023 – Aug 2024), I managed KYC documentation in the Core Banking System, conducted reviews, implemented regulations, investigated non-compliance, and delivered reports. 
+                        My expertise includes advanced Excel for financial analysis, IT management, network security, and audit processes.
                     </p>
                 </div>
             </div>
+
+            <h3 class="text-center mb-5 display-6">Skills</h3>
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-4 col-lg-3">
+                    <div class="card skill-card text-white text-center p-4 h-100">
+                        <img src="https://img.freepik.com/free-vector/technical-support-customer-tech-hotline-concept-flat-line-art-icons_126523-2200.jpg?semt=ais_hybrid&w=740&q=80" alt="IT Management & Support" class="skill-icon mx-auto mb-3">
+                        <h5>IT Management & Support</h5>
+                        <p>Hardware/Software Troubleshooting, Network Maintenance, User Support</p>
+                    </div>
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <div class="card skill-card text-white text-center p-4 h-100">
+                        <img src="https://www.shutterstock.com/image-vector/compliance-icon-logo-isolated-vector-600nw-2665597533.jpg" alt="Compliance & Audit" class="skill-icon mx-auto mb-3">
+                        <h5>Compliance & Internal Audit</h5>
+                        <p>KYC Management, Regulatory Implementation, Risk Investigation</p>
+                    </div>
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <div class="card skill-card text-white text-center p-4 h-100">
+                        <img src="https://www.myexcelonline.com/wp-content/uploads/2016/04/Icon-Sets-In-A-Pivot-Table-04.png" alt="Data Analytics" class="skill-icon mx-auto mb-3">
+                        <h5>Data Analytics & Excel</h5>
+                        <p>Pivot Tables, Formulas, Financial Modeling, Reporting</p>
+                    </div>
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <div class="card skill-card text-white text-center p-4 h-100">
+                        <img src="https://static.vecteezy.com/system/resources/previews/033/529/098/non_2x/cyber-security-icon-shield-with-padlock-and-network-icon-related-to-device-protect-computer-technology-flat-line-icon-style-simple-design-editable-vector.jpg" alt="Network Security" class="skill-icon mx-auto mb-3">
+                        <h5>Network Security</h5>
+                        <p>Wired/Wireless Networks, Security Protocols, IT Controls</p>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="text-center mt-5 mb-4 display-6">Certifications</h3>
+            <ul class="cert-list mx-auto" style="max-width: 800px;">
+                <li>Accounting Fundamentals – Corporate Finance Institute (Apr 2023)</li>
+                <li>Get Connected – Cisco Networking Academy (May 2022)</li>
+                <li>Excel Fundamentals – Formulas for Finance – Corporate Finance Institute (May 2022)</li>
+                <li>Computer Networking - Wired and Wireless Networks and Protocols – Alison (May 2022)</li>
+                <li>ISO Management System Audit Techniques and Best Practices – Alison (May 2022)</li>
+                <li>Understanding Information Control for IT Managers – Alison (Mar 2023)</li>
+                <li>Working as an IT Support Technician – Alison (Mar 2024)</li>
+            </ul>
+
+            <div class="text-center mt-5 social-links">
+                <a href="https://web.facebook.com/godson.praise.omoruyi" target="_blank" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                <a href="https://www.instagram.com/godsonpraise/" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.linkedin.com/in/godspower-omoruyi-78917b126" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+            </div>
+
+            <p class="text-center mt-4 fs-5">
+                <strong>Contact:</strong> +234 813 887 9938 | 
+                <a href="mailto:tnggmusicalcrew@gmail.com">tnggmusicalcrew@gmail.com</a>
+            </p>
         </div>
     </section>
 
-    <footer class="bg-dark text-white text-center py-4">
-        <p>&copy; 2025 Ragosa Tech. All rights reserved.</p>
+    <footer class="bg-dark text-white text-center py-5">
+        <p class="fs-5">&copy; 2025 Ragosa Tech. All rights reserved.</p>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Page load: hide spinner and fade in content
         window.addEventListener('load', function() {
             const loader = document.getElementById('page-loader');
             loader.style.opacity = '0';
             document.body.classList.add('loaded');
-
-            setTimeout(() => {
-                loader.remove();
-            }, 700);
+            setTimeout(() => { loader.remove(); }, 700);
         });
 
-        // Animate dashboard images when they enter viewport
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
