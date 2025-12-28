@@ -3,12 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Core Banking Application Solutions</title>
+    <title>Core Banking Application Solutions - God'spower Omoruyi</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; }
-        .hero { background: linear-gradient(rgba(0,31,63,0.8), rgba(0,31,63,0.8)), url('https://via.placeholder.com/1920x1080/001F3F/FFFFFF?text=Fintech+Background'); background-size: cover; color: white; }
+        body { 
+            font-family: 'Segoe UI', sans-serif;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            margin: 0;
+            padding: 0;
+        }
+        body.loaded {
+            opacity: 1;
+        }
+
+        /* Hero background visible during loading */
+        #page-loader {
+            background: linear-gradient(rgba(0,31,63,0.8), rgba(0,31,63,0.8)), 
+                        url('https://via.placeholder.com/1920x1080/001F3F/FFFFFF?text=Fintech+Background');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .hero { 
+            background: linear-gradient(rgba(0,31,63,0.8), rgba(0,31,63,0.8)), 
+                        url('https://via.placeholder.com/1920x1080/001F3F/FFFFFF?text=Fintech+Background'); 
+            background-size: cover; 
+            color: white; 
+        }
         .feature-icon { font-size: 2rem; color: #007BFF; }
         .section-bg { background-color: #f8f9fa; }
         .btn-primary { background-color: #007BFF; border: none; }
@@ -17,9 +40,40 @@
         .tier-badge { font-size: 1rem; padding: 0.5em 1em; }
         .navbar-brand img { height: 40px; margin-right: 10px; }
         .navbar-brand span { font-weight: bold; font-size: 1.3rem; }
+
+        /* Image Animation */
+        .dashboard-img {
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .dashboard-img.animated {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* About Section */
+        #about {
+            background-color: #001F3F;
+            color: white;
+        }
+        #about .lead {
+            font-size: 1.1rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
     </style>
 </head>
 <body>
+
+    <!-- Loading Spinner Overlay -->
+    <div id="page-loader" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index: 9999; transition: opacity 0.7s ease;">
+        <div class="spinner-border text-primary" role="status" style="width: 4rem; height: 4rem;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
 
     <!-- Navbar with Logo -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
@@ -37,6 +91,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
                     <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
                     <li class="nav-item"><a class="nav-link" href="#trust">Trust & Performance</a></li>
                     <li class="nav-item"><a class="nav-link" href="#ideal">Ideal For</a></li>
@@ -54,6 +109,23 @@
             <h2>Powering Real-World Financial Operations</h2>
             <p class="mt-4">I develop end-to-end core banking applications built to support the daily operational needs of financial institutions. My solutions are designed for reliability, efficiency, and growth—ready for real banking environments, not just demos.</p>
             <a href="#contact" class="btn btn-primary btn-lg mt-3">Get in Touch</a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">About Me</h2>
+            <p class="lead text-center">
+                I am an IT professional with extensive experience in enterprise service support, compliance, internal audit, and data management at LAPO Microfinance Bank Ltd. 
+                Currently serving as IT Enterprise Service Support (Sep 2024 – Present), I maintain computer systems and networks, troubleshoot hardware/software issues, provide end-user support, manage user accounts, and ensure smooth rollout of new applications. 
+                Previously, as Compliance and Inspection Manager (Mar 2023 – Aug 2024), I ensured full KYC documentation capture in the Core Banking System, conducted regular account reviews, implemented regulatory changes, investigated non-compliance, and prepared monthly compliance reports. 
+                My background also includes IT management, advanced Excel usage for financial data analysis (Pivot Tables, formulas), and multiple certifications in computer networking, network security, audit techniques, and IT support.
+            </p>
+            <p class="text-center mt-4">
+                <strong>Contact:</strong> +234 813 887 9938 | 
+                <a href="mailto:tnggmusicalcrew@gmail.com" class="text-white text-decoration-underline">tnggmusicalcrew@gmail.com</a>
+            </p>
         </div>
     </section>
 
@@ -152,25 +224,25 @@
     <section id="trust" class="py-5">
         <div class="container">
             <h2 class="text-center mb-5">🔐 Built for Trust & Performance</h2>
-            <div class="row text-center">
+            <div class="row text-center mb-5">
                 <div class="col-md-3"><h5>✔ High Security Standards</h5></div>
                 <div class="col-md-3"><h5>✔ Optimized Performance</h5></div>
                 <div class="col-md-3"><h5>✔ Regulatory & Compliance-Ready</h5></div>
                 <div class="col-md-3"><h5>✔ Scalable Architecture</h5></div>
             </div>
-            <!-- Dashboard Images -->
+            <!-- Dashboard Images with Animation -->
             <div class="row mt-5">
                 <div class="col-md-6 mb-4">
-                    <img src="{{ url_for('static', filename='dashboard.jpg') }}" class="img-fluid rounded shadow" alt="Dashboard 1">
+                    <img src="{{ url_for('static', filename='dashboard.jpg') }}" class="img-fluid dashboard-img shadow" alt="Dashboard 1">
                 </div>
                 <div class="col-md-6 mb-4">
-                    <img src="{{ url_for('static', filename='dashboard2.jpg') }}" class="img-fluid rounded shadow" alt="Dashboard 2">
+                    <img src="{{ url_for('static', filename='dashboard2.jpg') }}" class="img-fluid dashboard-img shadow" alt="Dashboard 2">
                 </div>
                 <div class="col-md-6 mb-4">
-                    <img src="{{ url_for('static', filename='dashboard3.jpg') }}" class="img-fluid rounded shadow" alt="Dashboard 3">
+                    <img src="{{ url_for('static', filename='dashboard3.jpg') }}" class="img-fluid dashboard-img shadow" alt="Dashboard 3">
                 </div>
                 <div class="col-md-6 mb-4">
-                    <img src="{{ url_for('static', filename='report.jpg') }}" class="img-fluid rounded shadow" alt="Reports">
+                    <img src="{{ url_for('static', filename='report.jpg') }}" class="img-fluid dashboard-img shadow" alt="Reports">
                 </div>
             </div>
         </div>
@@ -247,7 +319,7 @@
                     </form>
 
                     <div class="text-center mt-4">
-                        <p class="mb-1">📞 <strong>+2348138879938</strong></p>
+                        <p class="mb-1">📞 <strong>+234 813 887 9938</strong></p>
                         <p>📧 <a href="mailto:helpdesk.ragosa.tech@gmail.com">helpdesk.ragosa.tech@gmail.com</a></p>
                     </div>
                 </div>
@@ -260,5 +332,32 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Page load: hide spinner and fade in content
+        window.addEventListener('load', function() {
+            const loader = document.getElementById('page-loader');
+            loader.style.opacity = '0';
+            document.body.classList.add('loaded');
+
+            setTimeout(() => {
+                loader.remove();
+            }, 700);
+        });
+
+        // Animate dashboard images when they enter viewport
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animated');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.dashboard-img').forEach(img => {
+            observer.observe(img);
+        });
+    </script>
 </body>
 </html>
