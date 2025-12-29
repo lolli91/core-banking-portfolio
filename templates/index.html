@@ -75,6 +75,25 @@
             }
         }
 
+        /* Hero Title: Keep 🔹 CORE BANKING SOLUTIONS 🔹 on one line on mobile */
+        .hero-title {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        @media (max-width: 576px) {
+            .hero-title {
+                font-size: 2rem !important; /* Reduce size slightly but keep on one line */
+            }
+        }
+
+        @media (max-width: 400px) {
+            .hero-title {
+                font-size: 1.8rem !important;
+            }
+        }
+
         /* Feature Card Style */
         .feature-card {
             background: white;
@@ -173,7 +192,7 @@
     <!-- Hero Section -->
     <section id="home" class="hero min-vh-100 d-flex align-items-center text-center">
         <div class="container">
-            <h1 class="display-3 fw-bold mb-4">🔹 CORE BANKING SOLUTIONS 🔹</h1>
+            <h1 class="display-6 fw-bold mt-1 mb-4 hero-title">🔹 CORE BANKING SOLUTIONS 🔹</h1>
             <p class="lead mb-3">Secure • Scalable • Compliant</p>
             <h2 class="display-5 mb-4">Powering Real-World Financial Operations</h2>
             <p class="fs-5 mb-5">Rago Technology delivers robust, end-to-end core banking applications tailored for the operational demands of modern financial institutions. Built on proven architecture from real-world banking environments, our solutions prioritize reliability, regulatory compliance, and seamless scalability.</p>
@@ -399,25 +418,25 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 {{ form.name.label(class="form-label") }}
-                                {{ form.name(class="form-control form-control-lg", placeholder="Your Name") }}
+                                {{ form.name(class="form-control form-control-lg") }}
                                 {% if form.name.errors %}
                                     <div class="text-danger small">{{ form.name.errors[0] }}</div>
                                 {% endif %}
                             </div>
                             <div class="col-md-6">
                                 {{ form.company.label(class="form-label") }}
-                                {{ form.company(class="form-control form-control-lg", placeholder="Your Company (Optional)") }}
+                                {{ form.company(class="form-control form-control-lg") }}
                             </div>
                             <div class="col-md-6">
                                 {{ form.email.label(class="form-label") }}
-                                {{ form.email(class="form-control form-control-lg", placeholder="your@email.com") }}
+                                {{ form.email(class="form-control form-control-lg") }}
                                 {% if form.email.errors %}
                                     <div class="text-danger small">{{ form.email.errors[0] }}</div>
                                 {% endif %}
                             </div>
                             <div class="col-md-6">
                                 {{ form.phone.label(class="form-label") }}
-                                {{ form.phone(class="form-control form-control-lg", placeholder="+234... (Optional)") }}
+                                {{ form.phone(class="form-control form-control-lg") }}
                             </div>
                             <div class="col-12">
                                 {{ form.message.label(class="form-label") }}
