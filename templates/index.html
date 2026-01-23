@@ -3,223 +3,242 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rago Global Solutions Ltd</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- ==================== SEO FOUNDATION ==================== -->
+    <title>Rago Global Solutions Ltd | Secure & Scalable Core Banking Software Nigeria</title>
+    <meta name="description" content="Rago Global Solutions provides secure, compliant core banking solutions for microfinance banks, cooperatives, fintech startups and financial institutions in Nigeria. Features include automated KYC tiering, loans management, EOD processing, multi-branch support and full audit trails.">
+    
+    <meta name="keywords" content="core banking software, microfinance banking system, fintech solutions Nigeria, core banking platform, KYC tiering, loan management system, school management application, stock management software, fintech Nigeria">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Godspower Omoruyi, Rago Global Solutions Ltd">
+    <link rel="canonical" href="https://ragoglobalsolutions.com/"> <!-- Update with your actual domain when live -->
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="Rago Global Solutions Ltd – Core Banking & Fintech Solutions">
+    <meta property="og:description" content="Secure, scalable core banking platforms built for real-world financial operations in microfinance, cooperatives and fintech.">
+    <meta property="og:image" content="https://yourdomain.com/static/og-core-banking.jpg"> <!-- Replace with real 1200×630 image -->
+    <meta property="og:url" content="https://yourdomain.com/">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter / X Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Rago Global Solutions Ltd | Core Banking Solutions">
+    <meta name="twitter:description" content="Robust core banking software – KYC, loans, EOD, multi-branch, audit-ready.">
+    <meta name="twitter:image" content="https://yourdomain.com/static/og-core-banking.jpg">
+
+    <!-- Favicon placeholders – add your own files -->
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <style>
         body { 
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             opacity: 0;
-            transition: opacity 0.8s ease;
+            transition: opacity 1s ease;
             margin: 0;
             padding: 0;
+            background-color: #f8f9fa;
         }
         body.loaded {
             opacity: 1;
         }
 
-        /* Hero background visible during loading */
+        /* ── Enhanced Preloader ── */
         #page-loader {
-            background: linear-gradient(rgba(0,31,63,0.9), rgba(0,31,63,0.9)), 
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(rgba(0,31,63,0.94), rgba(0,31,63,0.94)), 
                         url('https://static.vecteezy.com/system/resources/previews/010/379/158/non_2x/abstract-fintech-finance-technology-applied-in-the-financial-business-on-a-modern-blue-background-concept-phone-and-smart-city-and-icons-fintech-business-futuristic-vector.jpg');
             background-size: cover;
             background-position: center;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: opacity 0.9s ease, visibility 0s 0.9s;
+        }
+        #page-loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        #page-loader .brand {
+            font-size: 2.4rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+        }
+        #page-loader .spinner-border {
+            width: 5.5rem;
+            height: 5.5rem;
+            border-width: 0.65rem;
         }
 
         .hero { 
-            background: linear-gradient(rgba(0,31,63,0.9), rgba(0,31,63,0.9)), 
-                        url('https://static.vecteezy.com/system/resources/previews/010/379/158/non_2x/abstract-fintech-finance-technology-applied-in-the-financial-business-on-a-modern-blue-background-concept-phone-and-smart-city-and-icons-fintech-business-futuristic-vector.jpg'); 
-            background-size: cover; 
+            background: linear-gradient(rgba(0,31,63,0.88), rgba(0,31,63,0.88)), 
+                        url('https://static.vecteezy.com/system/resources/previews/010/379/158/non_2x/abstract-fintech-finance-technology-applied-in-the-financial-business-on-a-modern-blue-background-concept-phone-and-smart-city-and-icons-fintech-business-futuristic-vector.jpg');
+            background-size: cover;
             background-position: center;
-            color: white; 
+            color: white;
+            min-height: 100vh;
         }
 
-        .feature-icon { font-size: 3rem; color: #007BFF; margin-bottom: 1rem; }
+        .feature-icon { font-size: 3.2rem; color: #007BFF; margin-bottom: 1.25rem; }
         .section-bg { background-color: #f8f9fa; }
-        .btn-primary { background-color: #007BFF; border: none; }
-        .navbar { background-color: #001F3F; }
-        .badge { font-size: 0.9rem; }
-        .tier-badge { font-size: 1rem; padding: 0.5em 1em; }
+        .btn-primary { background-color: #007BFF; border: none; transition: all 0.3s ease; }
+        .btn-primary:hover { background-color: #0056b3; transform: translateY(-2px); }
+        .navbar { background-color: #001F3F !important; }
+        .badge { font-size: 0.95rem; padding: 0.6em 1.1em; }
 
-        /* ── New styles for Goals & Projects ── */
+        /* Goals & Projects */
         .goal-number {
             display: inline-block;
-            width: 50px;
-            height: 50px;
-            line-height: 50px;
+            width: 55px;
+            height: 55px;
+            line-height: 55px;
             background: #007BFF;
             color: white;
             border-radius: 50%;
             font-weight: bold;
-            margin-bottom: 1rem;
+            font-size: 1.4rem;
+            margin-bottom: 1.2rem;
         }
         .goal-card, .project-card {
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.09);
+            transition: all 0.35s ease;
+            padding: 2.2rem;
             height: 100%;
         }
         .goal-card:hover, .project-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,123,255,0.2);
+            transform: translateY(-12px);
+            box-shadow: 0 22px 44px rgba(0,123,255,0.18);
         }
         .goals-grid, .projects-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.8rem;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: 2rem;
         }
         .projects-grid .card {
             background: #001F3F;
             color: white;
             border: none;
-            border-radius: 12px;
-            padding: 1.8rem;
-            transition: all 0.3s ease;
+            border-radius: 14px;
+            padding: 2rem;
+            transition: all 0.35s ease;
         }
         .projects-grid .card:hover {
-            background: #003366;
-            transform: translateY(-8px);
-        }
-        .projects-grid .card h4 {
-            color: #4da6ff;
-        }
-        /* ── End new styles ── */
-
-        /* Navbar brand: Logo left, title right (horizontal on all screens) */
-        .navbar-brand {
-            flex-direction: row;
-            align-items: center;
-        }
-        .navbar-brand img {
-            height: 45px; /* Slightly larger for better visibility */
-            margin-right: 12px;
-        }
-        .navbar-brand span {
-            font-weight: bold;
-            font-size: 1.4rem; /* Larger for desktop */
-            white-space: nowrap;
-        }
-
-        /* Mobile adjustments: Reduce size but keep horizontal */
-        @media (max-width: 768px) {
-            .navbar-brand img {
-                height: 38px;
-            }
-            .navbar-brand span {
-                font-size: 1.1rem;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .navbar-brand img {
-                height: 35px;
-            }
-            .navbar-brand span {
-                font-size: 1rem;
-            }
-        }
-
-        /* Hero Title: Keep 🔹 CORE BANKING SOLUTIONS 🔹 on one line on mobile */
-        .hero-title {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        @media (max-width: 576px) {
-            .hero-title {
-                font-size: 2rem !important; /* Reduce size slightly but keep on one line */
-            }
-        }
-
-        @media (max-width: 400px) {
-            .hero-title {
-                font-size: 1.8rem !important;
-            }
-        }
-
-        /* Feature Card Style */
-        .feature-card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            overflow: hidden;
-        }
-        .feature-card:hover {
+            background: #002b55;
             transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,123,255,0.2);
         }
+        .projects-grid .card h4 { color: #4da6ff; }
 
-        /* Dashboard Images Animation */
+        /* Dashboard images */
         .dashboard-img {
             opacity: 0;
-            transform: translateY(30px) scale(0.95);
-            transition: opacity 0.8s ease, transform 0.8s ease;
-            border-radius: 12px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            transform: translateY(40px) scale(0.94);
+            transition: all 1s cubic-bezier(0.22, 1, 0.36, 1);
+            border-radius: 14px;
+            box-shadow: 0 18px 40px rgba(0,0,0,0.28);
         }
         .dashboard-img.animated {
             opacity: 1;
             transform: translateY(0) scale(1);
         }
 
-        /* Services Section */
-        #services-section {
-            background: linear-gradient(135deg, #001F3F, #003366);
-            color: white;
-            padding-top: 6rem;
-            padding-bottom: 6rem;
-        }
+        /* Services glass effect */
         .service-card {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.14);
+            transition: all 0.35s ease;
         }
         .service-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,123,255,0.3);
+            transform: translateY(-12px);
+            box-shadow: 0 24px 48px rgba(0,123,255,0.25);
         }
         .service-icon {
-            width: 80px;
-            height: 80px;
+            width: 90px;
+            height: 90px;
             object-fit: contain;
+            margin-bottom: 1.4rem;
         }
-        .social-links a {
-            font-size: 2rem;
-            margin: 0 15px;
-            color: white;
-            transition: color 0.3s ease, transform 0.3s ease;
-        }
-        .social-links a:hover {
-            color: #007BFF;
-            transform: scale(1.2);
-        }
+
+        .social-links a:hover { color: #4da6ff !important; }
     </style>
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Rago Global Solutions Ltd",
+      "url": "https://yourdomain.com",
+      "logo": "{{ url_for('static', filename='logo.png') }}",
+      "description": "Provider of secure core banking software and fintech solutions for microfinance institutions, cooperatives and startups in Nigeria.",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+2348138879938",
+        "contactType": "customer support",
+        "email": "helpdesk.ragosa.tech@gmail.com",
+        "areaServed": "NG",
+        "availableLanguage": ["English"]
+      },
+      "sameAs": [
+        "https://web.facebook.com/godson.praise.omoruyi",
+        "https://www.instagram.com/godsonpraise/",
+        "https://www.linkedin.com/in/godspower-omoruyi-78917b126"
+      ]
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "serviceType": "Core Banking Solutions",
+      "provider": {
+        "@type": "Organization",
+        "name": "Rago Global Solutions Ltd",
+        "url": "https://yourdomain.com"
+      },
+      "areaServed": "Nigeria",
+      "description": "Secure, compliant core banking platform with KYC tiering, loan processing, EOD management, multi-branch support and regulatory-ready features for microfinance and fintech.",
+      "offers": {
+        "@type": "Offer",
+        "name": "Core Banking Software License & Implementation"
+      }
+    }
+    </script>
 </head>
 <body>
 
-    <!-- Loading Spinner Overlay -->
-    <div id="page-loader" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index: 9999; transition: opacity 0.7s ease;">
-        <div class="spinner-border text-primary" role="status" style="width: 5rem; height: 5rem;">
-            <span class="visually-hidden">Loading...</span>
+    <!-- Preloader -->
+    <div id="page-loader">
+        <div class="brand">Rago Global Solutions</div>
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading secure banking platform...</span>
         </div>
+        <p class="mt-4 fs-5">Preparing your experience...</p>
     </div>
 
-    <!-- Navbar with Logo -->
+    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow-lg">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="#">
                 <img src="{{ url_for('static', filename='logo.png') }}"
-                     onerror="this.onerror=null; this.src='{{ url_for('static', filename='Logo.png') }}';"
-                     alt="Rago Tech Logo"
-                     class="me-2">
+                     onerror="this.src='{{ url_for('static', filename='Logo.png') }}';"
+                     alt="Rago Global Solutions Ltd – Core Banking Software Logo"
+                     class="me-2" height="48">
                 <span>Rago Global Solutions Ltd</span>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -238,23 +257,24 @@
     </nav>
 
     <!-- Hero Section -->
-    <section id="home" class="hero min-vh-100 d-flex align-items-center text-center">
+    <section id="home" class="hero d-flex align-items-center text-center">
         <div class="container">
             <h1 class="display-4 fw-bold mt-5 hero-title">🔹 CORE BANKING 🔹</h1>
             <h1 class="display-4 fw-bold mb-4 hero-title">🔹 SOLUTIONS 🔹</h1>
-            <p class="lead mb-3">Secure • Scalable • Compliant</p>
+            <p class="lead mb-4 fs-4">Secure • Scalable • Compliant</p>
             <h2 class="display-5 mb-4">Powering Real-World Financial Operations</h2>
-            <p class="fs-5 mb-5">Rago Global Solutions delivers robust, end-to-end core banking applications tailored for the operational demands of modern financial institutions. Built on proven architecture from real-world banking environments, our solutions prioritize reliability, regulatory compliance, and seamless scalability.</p>
-            <a href="#contact" class="btn btn-primary btn-lg px-5 py-3 shadow">Get in Touch</a>
+            <p class="fs-5 mb-5 mx-auto" style="max-width: 780px;">
+                Robust end-to-end core banking applications built from real microfinance & banking experience — prioritizing reliability, CBN compliance and effortless scalability.
+            </p>
+            <a href="#contact" class="btn btn-primary btn-lg px-5 py-3 shadow-lg">Get in Touch</a>
         </div>
     </section>
 
-    <!-- Key Features with Cards -->
+    <!-- Key Features -->
     <section id="features" class="py-5 section-bg">
         <div class="container">
-            <h2 class="text-center mb-5 display-5">🔧 Key Features</h2>
+            <h2 class="text-center mb-5 display-5">🔧 Key Features of Our Core Banking Platform</h2>
             <div class="row g-4">
-                <!-- Intelligent Customer Onboarding & Auto Tiering -->
                 <div class="col-md-6 col-lg-4">
                     <div class="card feature-card h-100">
                         <div class="card-body text-center p-4">
@@ -270,7 +290,6 @@
                     </div>
                 </div>
 
-                <!-- Deposits & Account Management -->
                 <div class="col-md-6 col-lg-4">
                     <div class="card feature-card h-100">
                         <div class="card-body text-center p-4">
@@ -281,7 +300,6 @@
                     </div>
                 </div>
 
-                <!-- Loans & Repayment Processing -->
                 <div class="col-md-6 col-lg-4">
                     <div class="card feature-card h-100">
                         <div class="card-body text-center p-4">
@@ -292,7 +310,6 @@
                     </div>
                 </div>
 
-                <!-- Interest Processing & Capitalization -->
                 <div class="col-md-6 col-lg-4">
                     <div class="card feature-card h-100">
                         <div class="card-body text-center p-4">
@@ -303,7 +320,6 @@
                     </div>
                 </div>
 
-                <!-- End-of-Day (EOD) Management -->
                 <div class="col-md-6 col-lg-4">
                     <div class="card feature-card h-100">
                         <div class="card-body text-center p-4">
@@ -314,7 +330,6 @@
                     </div>
                 </div>
 
-                <!-- Maker-Checker Workflow & Role Management -->
                 <div class="col-md-6 col-lg-4">
                     <div class="card feature-card h-100">
                         <div class="card-body text-center p-4">
@@ -325,7 +340,6 @@
                     </div>
                 </div>
 
-                <!-- Teller & Vault Management -->
                 <div class="col-md-6 col-lg-4">
                     <div class="card feature-card h-100">
                         <div class="card-body text-center p-4">
@@ -336,7 +350,6 @@
                     </div>
                 </div>
 
-                <!-- General Ledger & Accounting -->
                 <div class="col-md-6 col-lg-4">
                     <div class="card feature-card h-100">
                         <div class="card-body text-center p-4">
@@ -347,7 +360,6 @@
                     </div>
                 </div>
 
-                <!-- SMS & Email Alerts -->
                 <div class="col-md-6 col-lg-4">
                     <div class="card feature-card h-100">
                         <div class="card-body text-center p-4">
@@ -358,7 +370,6 @@
                     </div>
                 </div>
 
-                <!-- Advanced Reporting & Analytics -->
                 <div class="col-md-6 col-lg-4">
                     <div class="card feature-card h-100">
                         <div class="card-body text-center p-4">
@@ -369,7 +380,6 @@
                     </div>
                 </div>
 
-                <!-- Enterprise Security & Compliance -->
                 <div class="col-md-6 col-lg-4">
                     <div class="card feature-card h-100">
                         <div class="card-body text-center p-4">
@@ -380,7 +390,6 @@
                     </div>
                 </div>
 
-                <!-- Fully Responsive & Modern UI -->
                 <div class="col-md-6 col-lg-4">
                     <div class="card feature-card h-100">
                         <div class="card-body text-center p-4">
@@ -415,16 +424,16 @@
             </div>
             <div class="row mt-5 g-4">
                 <div class="col-md-6 mb-4">
-                    <img src="{{ url_for('static', filename='dashboard.jpg') }}" class="img-fluid dashboard-img shadow-lg" alt="Dashboard 1">
+                    <img src="{{ url_for('static', filename='dashboard.jpg') }}" class="img-fluid dashboard-img shadow-lg" alt="Core banking dashboard – transaction overview">
                 </div>
                 <div class="col-md-6 mb-4">
-                    <img src="{{ url_for('static', filename='dashboard2.jpg') }}" class="img-fluid dashboard-img shadow-lg" alt="Dashboard 2">
+                    <img src="{{ url_for('static', filename='dashboard2.jpg') }}" class="img-fluid dashboard-img shadow-lg" alt="Core banking dashboard – loan management">
                 </div>
                 <div class="col-md-6 mb-4">
-                    <img src="{{ url_for('static', filename='dashboard3.jpg') }}" class="img-fluid dashboard-img shadow-lg" alt="Dashboard 3">
+                    <img src="{{ url_for('static', filename='dashboard3.jpg') }}" class="img-fluid dashboard-img shadow-lg" alt="Core banking dashboard – reporting interface">
                 </div>
                 <div class="col-md-6 mb-4">
-                    <img src="{{ url_for('static', filename='report.jpg') }}" class="img-fluid dashboard-img shadow-lg" alt="Reports">
+                    <img src="{{ url_for('static', filename='report.jpg') }}" class="img-fluid dashboard-img shadow-lg" alt="Core banking report – financial statements">
                 </div>
             </div>
         </div>
@@ -445,7 +454,7 @@
         </div>
     </section>
 
-    <!-- ── NEW: My Goals Section ── -->
+    <!-- Goals -->
     <section id="goals" class="py-5">
         <div class="container">
             <h2 class="text-center mb-5 display-5">🎯 Our Goals</h2>
@@ -469,7 +478,7 @@
         </div>
     </section>
 
-    <!-- ── NEW: Projects Section ── -->
+    <!-- Projects -->
     <section id="projects" class="py-5 section-bg">
         <div class="container">
             <h2 class="text-center mb-5 display-5">🚀 Projects</h2>
@@ -566,14 +575,14 @@
         </div>
     </section>
 
-    <!-- Services Section -->
+    <!-- Services -->
     <section id="services-section">
         <div class="container">
             <h2 class="text-center mb-5 display-4">About Our Solutions</h2>
             
             <div class="row align-items-center mb-5">
                 <div class="col-md-6 text-center mb-4">
-                    <img src="https://baseella.com/wp-content/uploads/2023/06/Core-banking-system-1024x613.png" class="img-fluid rounded shadow-lg" alt="Core Banking System Architecture">
+                    <img src="https://baseella.com/wp-content/uploads/2023/06/Core-banking-system-1024x613.png" class="img-fluid rounded shadow-lg" alt="Modern core banking system architecture diagram">
                 </div>
                 <div class="col-md-6">
                     <p class="lead fs-4 text-center text-md-start">
@@ -587,28 +596,28 @@
             <div class="row g-4 justify-content-center">
                 <div class="col-md-4 col-lg-3">
                     <div class="card service-card text-white text-center p-4 h-100">
-                        <img src="https://www.debutinfotech.com/_next/image?url=https%3A%2F%2Fblogs.debutinfotech.com%2Fwp-content%2Fuploads%2F2025%2F04%2FCustom-Software-Development-Companies.jpg&w=1920&q=85" alt="Custom Software Development" class="service-icon mx-auto mb-3 rounded">
+                        <img src="https://www.debutinfotech.com/_next/image?url=https%3A%2F%2Fblogs.debutinfotech.com%2Fwp-content%2Fuploads%2F2025%2F04%2FCustom-Software-Development-Companies.jpg&w=1920&q=85" alt="Custom software development team working on fintech solution" class="service-icon mx-auto mb-3 rounded">
                         <h5>Custom Software Development</h5>
                         <p>Tailored fintech applications, integrations, and bespoke solutions for unique business needs.</p>
                     </div>
                 </div>
                 <div class="col-md-4 col-lg-3">
                     <div class="card service-card text-white text-center p-4 h-100">
-                        <img src="https://thumbs.dreamstime.com/b/consulting-services-outline-concept-technical-support-online-call-center-vector-illustration-62471235.jpg" alt="IT Consulting & Support" class="service-icon mx-auto mb-3 rounded">
+                        <img src="https://thumbs.dreamstime.com/b/consulting-services-outline-concept-technical-support-online-call-center-vector-illustration-62471235.jpg" alt="IT consulting and technical support illustration" class="service-icon mx-auto mb-3 rounded">
                         <h5>IT Consulting & Support</h5>
                         <p>Expert guidance on system architecture, troubleshooting, network setup, and ongoing maintenance.</p>
                     </div>
                 </div>
                 <div class="col-md-4 col-lg-3">
                     <div class="card service-card text-white text-center p-4 h-100">
-                        <img src="https://www.slideteam.net/media/catalog/product/cache/1280x720/d/a/data_analytic_icon_with_report_dashboard_slide01.jpg" alt="Data Analytics & Reporting" class="service-icon mx-auto mb-3 rounded">
+                        <img src="https://www.slideteam.net/media/catalog/product/cache/1280x720/d/a/data_analytic_icon_with_report_dashboard_slide01.jpg" alt="Data analytics dashboard and reporting visualization" class="service-icon mx-auto mb-3 rounded">
                         <h5>Data Analytics & Reporting</h5>
                         <p>Advanced Excel modeling, pivot tables, custom dashboards, and financial insights generation.</p>
                     </div>
                 </div>
                 <div class="col-md-4 col-lg-3">
                     <div class="card service-card text-white text-center p-4 h-100">
-                        <img src="https://media.gettyimages.com/id/2158084250/vector/saas-solid-icons-collection-cloud-computing-api-integration-cloud-service-data-security.jpg?s=612x612&w=gi&k=20&c=-cviF6wSQ7OugwmJvBuTK9AlL3xGQpvbzr2WlJQOHJg=" alt="Network Security & Compliance" class="service-icon mx-auto mb-3 rounded">
+                        <img src="https://media.gettyimages.com/id/2158084250/vector/saas-solid-icons-collection-cloud-computing-api-integration-cloud-service-data-security.jpg?s=612x612&w=gi&k=20&c=-cviF6wSQ7OugwmJvBuTK9AlL3xGQpvbzr2WlJQOHJg=" alt="Network security, compliance and data protection icons" class="service-icon mx-auto mb-3 rounded">
                         <h5>Security & Compliance Services</h5>
                         <p>Audit support, risk management, KYC implementation, and regulatory compliance consulting.</p>
                     </div>
@@ -616,9 +625,9 @@
             </div>
 
             <div class="text-center mt-5 social-links">
-                <a href="https://web.facebook.com/godson.praise.omoruyi" target="_blank" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-                <a href="https://www.instagram.com/godsonpraise/" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                <a href="https://www.linkedin.com/in/godspower-omoruyi-78917b126" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="https://web.facebook.com/godson.praise.omoruyi" target="_blank" aria-label="Facebook"><i class="fab fa-facebook fa-2x mx-3"></i></a>
+                <a href="https://www.instagram.com/godsonpraise/" target="_blank" aria-label="Instagram"><i class="fab fa-instagram fa-2x mx-3"></i></a>
+                <a href="https://www.linkedin.com/in/godspower-omoruyi-78917b126" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin fa-2x mx-3"></i></a>
             </div>
 
             <p class="text-center mt-4 fs-5">
@@ -628,32 +637,34 @@
         </div>
     </section>
 
+    <!-- Footer -->
     <footer class="bg-dark text-white text-center py-5">
-        <p class="fs-5">© 2026 Rago Global Solutions Ltd. All rights reserved.</p>
+        <p class="fs-5 mb-1">© 2026 Rago Global Solutions Ltd. All rights reserved.</p>
+        <p class="text-muted small mt-2">Built with passion in Lagos, Nigeria</p>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
     <script>
-        window.addEventListener('load', function() {
+        // Preloader
+        window.addEventListener('load', () => {
             const loader = document.getElementById('page-loader');
-            loader.style.opacity = '0';
+            loader.classList.add('hidden');
             document.body.classList.add('loaded');
-            setTimeout(() => { loader.remove(); }, 700);
+            setTimeout(() => loader.remove(), 1000);
         });
 
-        const observer = new IntersectionObserver((entries) => {
+        // Image animation observer
+        const imgObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('animated');
-                    observer.unobserve(entry.target);
+                    imgObserver.unobserve(entry.target);
                 }
             });
-        }, { threshold: 0.1 });
+        }, { threshold: 0.15 });
 
-        document.querySelectorAll('.dashboard-img').forEach(img => {
-            observer.observe(img);
-        });
+        document.querySelectorAll('.dashboard-img').forEach(img => imgObserver.observe(img));
     </script>
 </body>
 </html>
