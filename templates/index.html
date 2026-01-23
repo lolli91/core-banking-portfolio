@@ -138,36 +138,54 @@
             transform: translateY(-10px);
         }
         .projects-grid .card h4 { color: #4da6ff; }
+        
+        /* Feature Card Style */
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,123,255,0.2);
+        }
 
-        /* Dashboard images */
+        /* Dashboard Images Animation */
         .dashboard-img {
             opacity: 0;
-            transform: translateY(40px) scale(0.94);
-            transition: all 1s cubic-bezier(0.22, 1, 0.36, 1);
-            border-radius: 14px;
-            box-shadow: 0 18px 40px rgba(0,0,0,0.28);
+            transform: translateY(30px) scale(0.95);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
         }
         .dashboard-img.animated {
             opacity: 1;
             transform: translateY(0) scale(1);
         }
 
-        /* Services glass effect */
+        /* Services Section */
+        #services-section {
+            background: linear-gradient(135deg, #001F3F, #003366);
+            color: white;
+            padding-top: 6rem;
+            padding-bottom: 6rem;
+        }
         .service-card {
-            background: rgba(255,255,255,0.08);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.14);
-            transition: all 0.35s ease;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .service-card:hover {
-            transform: translateY(-12px);
-            box-shadow: 0 24px 48px rgba(0,123,255,0.25);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,123,255,0.3);
         }
         .service-icon {
-            width: 90px;
-            height: 90px;
+            width: 80px;
+            height: 80px;
             object-fit: contain;
-            margin-bottom: 1.4rem;
         }
 
         .social-links a:hover { color: #4da6ff !important; }
