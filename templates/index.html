@@ -88,6 +88,36 @@
             min-height: 100vh;
         }
 
+        .hero-title-wrapper {
+    line-height: 1.1;
+}
+
+.hero-title {
+    font-weight: 800;
+    line-height: 1.05;
+    margin-bottom: 1.5rem;
+    /* Let text wrap naturally */
+    white-space: normal;
+    word-break: break-word;
+    hyphens: auto;
+}
+
+/* Responsive font size using clamp (very modern & smooth) */
+.hero-title {
+    font-size: clamp(2.1rem, 8vw, 4.5rem);
+}
+
+/* Optional: Force break between "CORE BANKING" and "SOLUTIONS" on very small screens */
+@media (max-width: 576px) {
+    .hero-title span {
+        display: block;
+    }
+    
+    .hero-title {
+        font-size: clamp(2.0rem, 9vw, 3.8rem);
+    }
+}
+
         .feature-icon { font-size: 3.2rem; color: #007BFF; margin-bottom: 1.25rem; }
         .section-bg { background-color: #f8f9fa; }
         .btn-primary { background-color: #007BFF; border: none; transition: all 0.3s ease; }
@@ -275,18 +305,22 @@
     </nav>
 
     <!-- Hero Section -->
-    <section id="home" class="hero d-flex align-items-center text-center">
-        <div class="container">
-            <h1 class="display-4 fw-bold mt-5 hero-title">🔹 CORE BANKING 🔹</h1>
-            <h1 class="display-4 fw-bold mb-4 hero-title">SOLUTIONS</h1>
-            <p class="lead mb-4 fs-4">Secure • Scalable • Compliant</p>
-            <h2 class="display-5 mb-4">Powering Real-World Financial Operations</h2>
-            <p class="fs-5 mb-5 mx-auto" style="max-width: 780px;">
-                Robust end-to-end core banking applications built from real microfinance & banking experience — prioritizing reliability, CBN compliance and effortless scalability.
-            </p>
-            <a href="#contact" class="btn btn-primary btn-lg px-5 py-3 shadow-lg">Get in Touch</a>
+<section id="home" class="hero d-flex align-items-center text-center">
+    <div class="container">
+        <div class="hero-title-wrapper">
+            <h1 class="display-4 fw-bold mt-5 hero-title">
+                <span class="d-inline-block">🔹 CORE BANKING</span>
+                <span class="d-inline-block">SOLUTIONS 🔹</span>
+            </h1>
         </div>
-    </section>
+        <p class="lead mb-4 fs-4">Secure • Scalable • Compliant</p>
+        <h2 class="display-5 mb-4">Powering Real-World Financial Operations</h2>
+        <p class="fs-5 mb-5 mx-auto" style="max-width: 780px;">
+            Robust end-to-end core banking applications built from real microfinance & banking experience — prioritizing reliability, CBN compliance and effortless scalability.
+        </p>
+        <a href="#contact" class="btn btn-primary btn-lg px-5 py-3 shadow-lg">Get in Touch</a>
+    </div>
+</section>
 
     <!-- Key Features -->
     <section id="features" class="py-5 section-bg">
