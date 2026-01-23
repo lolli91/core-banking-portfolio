@@ -34,192 +34,202 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
-        body { 
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            opacity: 0;
-            transition: opacity 1s ease;
-            margin: 0;
-            padding: 0;
-            background-color: #f8f9fa;
-        }
-        body.loaded {
-            opacity: 1;
-        }
-
-        /* ── Enhanced Preloader ── */
-        #page-loader {
-            position: fixed;
-            inset: 0;
-            background: linear-gradient(rgba(0,31,63,0.94), rgba(0,31,63,0.94)), 
-                        url('https://static.vecteezy.com/system/resources/previews/010/379/158/non_2x/abstract-fintech-finance-technology-applied-in-the-financial-business-on-a-modern-blue-background-concept-phone-and-smart-city-and-icons-fintech-business-futuristic-vector.jpg');
-            background-size: cover;
-            background-position: center;
-            z-index: 99999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            transition: opacity 0.9s ease, visibility 0s 0.9s;
-        }
-        #page-loader.hidden {
-            opacity: 0;
-            visibility: hidden;
-        }
-        #page-loader .brand {
-            font-size: 2.4rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            letter-spacing: 1px;
-            text-shadow: 0 2px 12px rgba(0,0,0,0.5);
-        }
-        #page-loader .spinner-border {
-            width: 5.5rem;
-            height: 5.5rem;
-            border-width: 0.65rem;
-        }
-
-        .hero { 
-            background: linear-gradient(rgba(0,31,63,0.88), rgba(0,31,63,0.88)), 
-                        url('https://static.vecteezy.com/system/resources/previews/010/379/158/non_2x/abstract-fintech-finance-technology-applied-in-the-financial-business-on-a-modern-blue-background-concept-phone-and-smart-city-and-icons-fintech-business-futuristic-vector.jpg');
-            background-size: cover;
-            background-position: center;
-            color: white;
-            min-height: 100vh;
-        }
-
-        .hero-title-wrapper {
-    line-height: 1.1;
-}
-
-.hero-title {
-    font-weight: 800;
-    line-height: 1.05;
-    margin-bottom: 1.5rem;
-    /* Let text wrap naturally */
-    white-space: normal;
-    word-break: break-word;
-    hyphens: auto;
-}
-
-/* Responsive font size using clamp (very modern & smooth) */
-.hero-title {
-    font-size: clamp(2.1rem, 8vw, 4.5rem);
-}
-
-/* Optional: Force break between "CORE BANKING" and "SOLUTIONS" on very small screens */
-@media (max-width: 576px) {
-    .hero-title span {
-        display: block;
+    body { 
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        opacity: 0;
+        transition: opacity 1s ease;
+        margin: 0;
+        padding: 0;
+        background-color: #f8f9fa;
     }
-    
+    body.loaded {
+        opacity: 1;
+    }
+
+    /* ── Enhanced Preloader ── */
+    #page-loader {
+        position: fixed;
+        inset: 0;
+        background: linear-gradient(rgba(0,31,63,0.94), rgba(0,31,63,0.94)), 
+                    url('https://static.vecteezy.com/system/resources/previews/010/379/158/non_2x/abstract-fintech-finance-technology-applied-in-the-financial-business-on-a-modern-blue-background-concept-phone-and-smart-city-and-icons-fintech-business-futuristic-vector.jpg');
+        background-size: cover;
+        background-position: center;
+        z-index: 99999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        transition: opacity 0.9s ease, visibility 0s 0.9s;
+    }
+    #page-loader.hidden {
+        opacity: 0;
+        visibility: hidden;
+    }
+    #page-loader .brand {
+        font-size: 2.4rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        letter-spacing: 1px;
+        text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+    }
+    #page-loader .spinner-border {
+        width: 5.5rem;
+        height: 5.5rem;
+        border-width: 0.65rem;
+    }
+
+    .hero { 
+        background: linear-gradient(rgba(0,31,63,0.88), rgba(0,31,63,0.88)), 
+                    url('https://static.vecteezy.com/system/resources/previews/010/379/158/non_2x/abstract-fintech-finance-technology-applied-in-the-financial-business-on-a-modern-blue-background-concept-phone-and-smart-city-and-icons-fintech-business-futuristic-vector.jpg');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        min-height: 100vh;
+    }
+
+    /* ── Hero Title – Forced single line on ALL screen sizes ── */
     .hero-title {
-        font-size: clamp(2.0rem, 9vw, 3.8rem);
-    }
-}
-
-        .feature-icon { font-size: 3.2rem; color: #007BFF; margin-bottom: 1.25rem; }
-        .section-bg { background-color: #f8f9fa; }
-        .btn-primary { background-color: #007BFF; border: none; transition: all 0.3s ease; }
-        .btn-primary:hover { background-color: #0056b3; transform: translateY(-2px); }
-        .navbar { background-color: #001F3F !important; }
-        .badge { font-size: 0.95rem; padding: 0.6em 1.1em; }
-
-        /* Goals & Projects */
-        .goal-number {
-            display: inline-block;
-            width: 55px;
-            height: 55px;
-            line-height: 55px;
-            background: #007BFF;
-            color: white;
-            border-radius: 50%;
-            font-weight: bold;
-            font-size: 1.4rem;
-            margin-bottom: 1.2rem;
-        }
-        .goal-card, .project-card {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 12px 32px rgba(0,0,0,0.09);
-            transition: all 0.35s ease;
-            padding: 2.2rem;
-            height: 100%;
-        }
-        .goal-card:hover, .project-card:hover {
-            transform: translateY(-12px);
-            box-shadow: 0 22px 44px rgba(0,123,255,0.18);
-        }
-        .goals-grid, .projects-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-            gap: 2rem;
-        }
-        .projects-grid .card {
-            background: #001F3F;
-            color: white;
-            border: none;
-            border-radius: 14px;
-            padding: 2rem;
-            transition: all 0.35s ease;
-        }
-        .projects-grid .card:hover {
-            background: #002b55;
-            transform: translateY(-10px);
-        }
-        .projects-grid .card h4 { color: #4da6ff; }
+        font-weight: 800;
+        line-height: 1.05;
+        margin: 2rem 0 1.5rem;
+        text-align: center;
         
-        /* Feature Card Style */
-        .feature-card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            overflow: hidden;
-        }
-        .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,123,255,0.2);
-        }
+        /* Critical rules to prevent wrapping */
+        white-space: nowrap !important;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: inline-block;
+        max-width: 100%;
+        
+        /* No breaking allowed */
+        word-break: keep-all;
+        hyphens: none;
+        overflow-wrap: normal;
+        
+        /* Responsive but safe font size */
+        font-size: clamp(1rem, 7.8vw, 3.5rem);
+    }
 
-        /* Dashboard Images Animation */
-        .dashboard-img {
-            opacity: 0;
-            transform: translateY(30px) scale(0.95);
-            transition: opacity 0.8s ease, transform 0.8s ease;
-            border-radius: 12px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    /* Extra aggressive size reduction on narrow screens */
+    @media (max-width: 576px) {
+        .hero-title {
+            font-size: clamp(1.15rem, 9.5vw, 1rem);
+            margin: 1.5rem 0 1rem;
+            padding: 0 12px;
+            letter-spacing: -0.4px;
         }
-        .dashboard-img.animated {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
+    }
 
-        /* Services Section */
-        #services-section {
-            background: linear-gradient(135deg, #001F3F, #003366);
-            color: white;
-            padding-top: 6rem;
-            padding-bottom: 6rem;
+    @media (max-width: 400px) {
+        .hero-title {
+            font-size: clamp(1.65rem, 10.5vw, 3rem);
+            padding: 0 10px;
         }
-        .service-card {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .service-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,123,255,0.3);
-        }
-        .service-icon {
-            width: 80px;
-            height: 80px;
-            object-fit: contain;
-        }
+    }
 
-        .social-links a:hover { color: #4da6ff !important; }
-    </style>
+    .feature-icon { font-size: 3.2rem; color: #007BFF; margin-bottom: 1.25rem; }
+    .section-bg { background-color: #f8f9fa; }
+    .btn-primary { background-color: #007BFF; border: none; transition: all 0.3s ease; }
+    .btn-primary:hover { background-color: #0056b3; transform: translateY(-2px); }
+    .navbar { background-color: #001F3F !important; }
+    .badge { font-size: 0.95rem; padding: 0.6em 1.1em; }
+
+    /* Goals & Projects */
+    .goal-number {
+        display: inline-block;
+        width: 55px;
+        height: 55px;
+        line-height: 55px;
+        background: #007BFF;
+        color: white;
+        border-radius: 50%;
+        font-weight: bold;
+        font-size: 1.4rem;
+        margin-bottom: 1.2rem;
+    }
+    .goal-card, .project-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 12px 32px rgba(0,0,0,0.09);
+        transition: all 0.35s ease;
+        padding: 2.2rem;
+        height: 100%;
+    }
+    .goal-card:hover, .project-card:hover {
+        transform: translateY(-12px);
+        box-shadow: 0 22px 44px rgba(0,123,255,0.18);
+    }
+    .goals-grid, .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+        gap: 2rem;
+    }
+    .projects-grid .card {
+        background: #001F3F;
+        color: white;
+        border: none;
+        border-radius: 14px;
+        padding: 2rem;
+        transition: all 0.35s ease;
+    }
+    .projects-grid .card:hover {
+        background: #002b55;
+        transform: translateY(-10px);
+    }
+    .projects-grid .card h4 { color: #4da6ff; }
+    
+    /* Feature Card Style */
+    .feature-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        overflow: hidden;
+    }
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,123,255,0.2);
+    }
+
+    /* Dashboard Images Animation */
+    .dashboard-img {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+        transition: opacity 0.8s ease, transform 0.8s ease;
+        border-radius: 12px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    }
+    .dashboard-img.animated {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    /* Services Section */
+    #services-section {
+        background: linear-gradient(135deg, #001F3F, #003366);
+        color: white;
+        padding-top: 6rem;
+        padding-bottom: 6rem;
+    }
+    .service-card {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .service-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,123,255,0.3);
+    }
+    .service-icon {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+    }
+
+    .social-links a:hover { color: #4da6ff !important; }
+</style>
 
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
@@ -307,12 +317,9 @@
     <!-- Hero Section -->
 <section id="home" class="hero d-flex align-items-center text-center">
     <div class="container">
-        <div class="hero-title-wrapper">
-            <h1 class="display-4 fw-bold mt-5 hero-title">
-                <span class="d-inline-block">🔹 CORE BANKING</span>
-                <span class="d-inline-block">SOLUTIONS 🔹</span>
-            </h1>
-        </div>
+        <h1 class="display-4 fw-bold mt-5 hero-title">
+            🔹 CORE BANKING SOLUTIONS 🔹
+        </h1>
         <p class="lead mb-4 fs-4">Secure • Scalable • Compliant</p>
         <h2 class="display-5 mb-4">Powering Real-World Financial Operations</h2>
         <p class="fs-5 mb-5 mx-auto" style="max-width: 780px;">
