@@ -252,6 +252,45 @@
         }
     }
 
+    /* Navbar Brand Text – Responsive sizing */
+    .navbar-brand .brand-text {
+        font-weight: bold;
+        font-size: 1.4rem;           /* Desktop / tablet default */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 220px;            /* Prevents pushing toggler too far */
+    }
+
+    /* Mobile – smaller text */
+    @media (max-width: 991.98px) {
+        .navbar-brand .brand-text {
+            font-size: 1.15rem;      /* Good balance for mobile */
+            max-width: 180px;
+        }
+        
+        /* Extra small phones – even smaller + slight letter spacing */
+        @media (max-width: 576px) {
+            .navbar-brand .brand-text {
+                font-size: 1.05rem;
+                max-width: 160px;
+                letter-spacing: -0.3px;
+            }
+        }
+    }
+
+    /* Ensure logo + text don't overflow the container on mobile */
+    @media (max-width: 991.98px) {
+        .navbar-brand {
+            max-width: calc(100% - 70px);  /* Leaves space for fixed toggler */
+            flex-shrink: 1;
+        }
+        
+        .navbar-brand img {
+            height: 40px !important;     /* Slightly smaller logo on mobile */
+        }
+    }
+
     /* Optional: Smooth scroll behavior when clicking nav links */
     html {
         scroll-behavior: smooth;
@@ -417,7 +456,7 @@
                     onerror="this.src='{{ url_for('static', filename='Logo.png') }}';"
                     alt="Rago Global Solutions Ltd – Core Banking Software Logo"
                     class="me-2" height="48">
-                <span>Rago Global Solutions Ltd</span>
+                <span class="brand-text">Rago Global Solutions Ltd</span>
             </a>
             <!-- Add 'navbar-toggler-end' class here -->
             <button class="navbar-toggler navbar-toggler-end" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
