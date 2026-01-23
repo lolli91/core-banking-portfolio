@@ -108,13 +108,13 @@
         overflow-wrap: normal;
         
         /* Responsive but safe font size */
-        font-size: clamp(1rem, 7.8vw, 3.5rem);
+        font-size: clamp(1rem, 7.8vw, 1.75rem);
     }
 
     /* Extra aggressive size reduction on narrow screens */
     @media (max-width: 576px) {
         .hero-title {
-            font-size: clamp(1.15rem, 7.5vw, 1rem);
+            font-size: clamp(1.15rem, 7.5vw, 1.75rem);
             margin: 1.5rem 0 1rem;
             padding: 0 12px;
             letter-spacing: -0.4px;
@@ -123,7 +123,7 @@
 
     @media (max-width: 400px) {
         .hero-title {
-            font-size: clamp(1.15rem, 7.5vw, 1rem);
+            font-size: clamp(1.15rem, 7.5vw, 1.75rem);
             padding: 0 10px;
         }
     }
@@ -133,6 +133,68 @@
     .btn-primary { background-color: #007BFF; border: none; transition: all 0.3s ease; }
     .btn-primary:hover { background-color: #0056b3; transform: translateY(-2px); }
     .navbar { background-color: #001F3F !important; }
+    .navbar-nav .nav-link {
+        position: relative;
+        color: rgba(255, 255, 255, 0.85) !important;
+        padding: 0.5rem 1rem !important;
+        transition: all 0.3s ease;
+        border-radius: 6px;
+    }
+
+    /* Desktop Hover Effect – Underline + Color */
+    @media (min-width: 992px) {
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link:focus {
+            color: #4da6ff !important;
+        }
+        
+        .navbar-nav .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 3px;
+            bottom: 8px;
+            left: 50%;
+            background-color: #007BFF;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        
+        .navbar-nav .nav-link:hover::after {
+            width: 70%;
+        }
+    }
+
+    /* Mobile Tap Feedback (when menu is open) */
+    @media (max-width: 991.98px) {
+        .navbar-nav .nav-link {
+            border-radius: 8px;
+            margin: 4px 12px;
+        }
+        
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link:active,
+        .navbar-nav .nav-link:focus {
+            background-color: rgba(0, 123, 255, 0.2) !important;
+            color: #fff !important;
+        }
+    }
+
+    /* Active/Current Section Highlight */
+    .navbar-nav .nav-link.active {
+        color: #4da6ff !important;
+        font-weight: 600;
+    }
+    @media (min-width: 992px) {
+        .navbar-nav .nav-link.active::after {
+            width: 70%;
+        }
+    }
+
+    /* Optional: Smooth scroll behavior when clicking nav links */
+    html {
+        scroll-behavior: smooth;
+    }
     .badge { font-size: 0.95rem; padding: 0.6em 1.1em; }
 
     /* Goals & Projects */
@@ -461,10 +523,10 @@
             </div>
 
             <div class="text-center mt-5">
-                <span class="badge bg-primary mx-1">Multi-Branch & Zone Support</span>
-                <span class="badge bg-success mx-1">Group Lending</span>
-                <span class="badge bg-info mx-1">Online Customer Onboarding</span>
-                <span class="badge bg-warning mx-1">Custom Themes</span>
+                <span class="badge bg-primary mx-1 mb-3">Multi-Branch & Zone Support</span>
+                <span class="badge bg-success mx-1 mb-3">Group Lending</span>
+                <span class="badge bg-info mx-1 mb-3">Online Customer Onboarding</span>
+                <span class="badge bg-warning mx-1 mb-3">Custom Themes</span>
                 <span class="badge bg-danger mx-1">Real-time Audit Trail</span>
                 <span class="badge bg-dark mx-1">Automatic KYC Tiering</span>
             </div>
