@@ -41,6 +41,52 @@
         .badge { font-size: 0.9rem; }
         .tier-badge { font-size: 1rem; padding: 0.5em 1em; }
 
+        /* ── New styles for Goals & Projects ── */
+        .goal-number {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            line-height: 50px;
+            background: #007BFF;
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .goal-card, .project-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            padding: 2rem;
+            height: 100%;
+        }
+        .goal-card:hover, .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,123,255,0.2);
+        }
+        .goals-grid, .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.8rem;
+        }
+        .projects-grid .card {
+            background: #001F3F;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 1.8rem;
+            transition: all 0.3s ease;
+        }
+        .projects-grid .card:hover {
+            background: #003366;
+            transform: translateY(-8px);
+        }
+        .projects-grid .card h4 {
+            color: #4da6ff;
+        }
+        /* ── End new styles ── */
+
         /* Navbar brand: Logo left, title right (horizontal on all screens) */
         .navbar-brand {
             flex-direction: row;
@@ -137,11 +183,6 @@
             transform: translateY(-10px);
             box-shadow: 0 20px 40px rgba(0,123,255,0.3);
         }
-        .service-icon {
-            width: 80px;
-            height: 80px;
-            object-fit: contain;
-        }
         .social-links a {
             font-size: 2rem;
             margin: 0 15px;
@@ -182,6 +223,8 @@
                     <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
                     <li class="nav-item"><a class="nav-link" href="#trust">Trust & Performance</a></li>
                     <li class="nav-item"><a class="nav-link" href="#ideal">Ideal For</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#goals">Goals</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#projects">Projects</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
                     <li class="nav-item"><a class="nav-link" href="#services-section">Services</a></li>
                 </ul>
@@ -397,6 +440,63 @@
         </div>
     </section>
 
+    <!-- ── NEW: My Goals Section ── -->
+    <section id="goals" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5 display-5">🎯 My Goals</h2>
+            <div class="goals-grid">
+                <div class="goal-card text-center">
+                    <span class="goal-number">01</span>
+                    <h4>Professional Web Developer</h4>
+                    <p>Build strong frontend and backend skills to work on real projects.</p>
+                </div>
+                <div class="goal-card text-center">
+                    <span class="goal-number">02</span>
+                    <h4>Real-World Projects</h4>
+                    <p>Create applications that solve real business problems.</p>
+                </div>
+                <div class="goal-card text-center">
+                    <span class="goal-number">03</span>
+                    <h4>Problem Solving</h4>
+                    <p>Improve logical thinking and coding efficiency daily.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── NEW: Projects Section ── -->
+    <section id="projects" class="py-5 section-bg">
+        <div class="container">
+            <h2 class="text-center mb-5 display-5">🚀 Projects</h2>
+            <div class="projects-grid">
+                <div class="card text-center">
+                    <h4>Personal Profile Page</h4>
+                    <p>A responsive profile website built with HTML and CSS.</p>
+                </div>
+                <div class="card text-center">
+                    <h4>Login UI Design</h4>
+                    <p>A clean login interface focused on usability and layout.</p>
+                </div>
+                <div class="card text-center">
+                    <h4>Core Banking Software</h4>
+                    <p>Powering Real-World Financial Operations</p>
+                </div>
+                <div class="card text-center">
+                    <h4>School Management Application</h4>
+                    <p>Real-World School Automation Solution</p>
+                </div>
+                <div class="card text-center">
+                    <h4>Stock Management Application</h4>
+                    <p>Real-Time Inventory Optimization & Management</p>
+                </div>
+                <div class="card text-center">
+                    <h4>Upcoming Project</h4>
+                    <p>Currently working on new web applications.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Contact -->
     <section id="contact" class="py-5 bg-light">
         <div class="container">
@@ -524,7 +624,7 @@
     </section>
 
     <footer class="bg-dark text-white text-center py-5">
-        <p class="fs-5">&copy; 2025 Rago Global Solutions Ltd. All rights reserved.</p>
+        <p class="fs-5">© 2025 Rago Global Solutions Ltd. All rights reserved.</p>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
