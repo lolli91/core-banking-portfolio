@@ -35,12 +35,17 @@ app = Flask(__name__,
 
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY") or os.urandom(32).hex()
 
-# Temporary Vercel fix: SQLite in /tmp (writable on serverless)
+# ── TEMPORARY VERCEL SQLITE FIX ──
+# Use /tmp (only writable folder on Vercel serverless)
+# WARNING: Database WILL RESET on every cold start / redeploy
+# This is ONLY for testing — switch to PostgreSQL/Neon soon!
 import os
-if os.getenv("VERCEL"):  # Vercel sets this env var automatically
-    db_path = "/tmp/rago_app.db"
+if 'VERCEL' in os.environ:           # Vercel sets this automatically
+    db_path = '/tmp/rago_app.db'
+    print("Vercel detected → using writable /tmp for SQLite")
 else:
-    db_path = "rago_app.db"  # local SQLite file
+    db_path = 'rago_app.db'          # local dev file
+    print("Local dev → using project folder for SQLite")
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL", f"sqlite:///{db_path}")
 
@@ -51,10 +56,10 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=14)
 
 db = SQLAlchemy(app)
 
-# Initialize Migrate — AFTER db is created
+# Initialize Migrate AFTER db
 migrate = Migrate(app, db)
 
-# Flask-Login setup
+# Flask-Login
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'admin_login'
