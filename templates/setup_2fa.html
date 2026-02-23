@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enable 2FA - Rago Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-dark text-light">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card bg-dark border-light shadow">
+                    <div class="card-body p-5">
+                        <h2 class="text-center mb-4">Setup Two-Factor Authentication</h2>
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}<div class="alert alert-info">{{ messages[0][1] }}</div>{% endif %}
+                        {% endwith %}
+
+                        {% if qr_img %}
+                        <div class="text-center mb-4">
+                            <img src="data:image/png;base64,{{ qr_img }}" alt="2FA QR Code" class="img-fluid mb-3" style="max-width:220px;">
+                            <p>Scan with Google Authenticator / Authy</p>
+                            <p class="small text-muted">Secret (manual entry): <code>{{ secret }}</code></p>
+                        </div>
+                        {% else %}
+                        <p class="text-center">Click below to enable 2FA.</p>
+                        {% endif %}
+
+                        <form method="POST">
+                            {{ form.hidden_tag() }}
+                            {{ form.submit(class="btn btn-success w-100 py-3 fw-bold") }}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

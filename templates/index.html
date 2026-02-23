@@ -32,6 +32,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 
     <style>
     body { 
@@ -157,7 +158,7 @@
     .navbar-nav .nav-link {
         position: relative;
         color: rgba(255, 255, 255, 0.85) !important;
-        padding: 0.5rem 1rem !important;
+        padding: 0.5rem 1rem;
         transition: all 0.3s ease;
         border-radius: 6px;
     }
@@ -390,6 +391,29 @@
     }
 
     .social-links a:hover { color: #4da6ff !important; }
+
+    .admin-btn {
+        background-color: rgba(255, 193, 7, 0.18);   /* light warning/yellow tint */
+        color: #ffc107 !important;
+        border: 1px solid #ffc10755;
+        transition: all 0.25s ease;
+    }
+
+    .admin-btn:hover,
+    .admin-btn:focus {
+        background-color: #ffc107 !important;
+        color: #001f3f !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(255,193,7,0.3);
+    }
+
+    @media (max-width: 991.98px) {
+        .admin-btn {
+            margin: 8px 16px !important;
+            text-align: center;
+            background-color: rgba(255, 193, 7, 0.25);
+        }
+    }
 </style>
 </head>
 <body>
@@ -427,6 +451,12 @@
                     <li class="nav-item"><a class="nav-link" href="#projects">Projects</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
                     <li class="nav-item"><a class="nav-link" href="#services-section">Services</a></li>
+                    <li class="nav-item">   <!-- adds extra left margin on large screens -->
+                        <a class="nav-link admin-btn fw-bold px-3 py-2 rounded"
+                           href="{{ url_for('admin_login') }}">
+                            <i class="fas fa-user-shield"></i>Login
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -443,6 +473,10 @@
         <p class="fs-5 mb-5 mx-auto" style="max-width: 780px;">
             Robust end-to-end core banking applications built from real microfinance & banking experience — prioritizing reliability, CBN compliance and effortless scalability.
         </p>
+        <!-- Inside hero container, after "Get in Touch" -->
+        <a href="{{ url_for('request_demo') }}" class="btn btn-outline-light btn-lg px-5 py-3 shadow-lg ms-3">
+            <i class="fas fa-calendar-check me-2"></i> Request a Demo
+        </a>
         <a href="#contact" class="btn btn-primary btn-lg px-5 py-3 shadow-lg">Get in Touch</a>
     </div>
 </section>
@@ -693,61 +727,10 @@
         <div class="container">
             <h2 class="text-center mb-5 display-5">Get in Touch</h2>
             <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                        {% if messages %}
-                            {% for category, message in messages %}
-                                <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show">
-                                    {{ message }}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                </div>
-                            {% endfor %}
-                        {% endif %}
-                    {% endwith %}
-
-                    <form method="POST" novalidate>
-                        {{ form.hidden_tag() }}
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                {{ form.name.label(class="form-label") }}
-                                {{ form.name(class="form-control form-control-lg") }}
-                                {% if form.name.errors %}
-                                    <div class="text-danger small">{{ form.name.errors[0] }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-6">
-                                {{ form.company.label(class="form-label") }}
-                                {{ form.company(class="form-control form-control-lg") }}
-                            </div>
-                            <div class="col-md-6">
-                                {{ form.email.label(class="form-label") }}
-                                {{ form.email(class="form-control form-control-lg") }}
-                                {% if form.email.errors %}
-                                    <div class="text-danger small">{{ form.email.errors[0] }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-6">
-                                {{ form.phone.label(class="form-label") }}
-                                {{ form.phone(class="form-control form-control-lg") }}
-                            </div>
-                            <div class="col-12">
-                                {{ form.message.label(class="form-label") }}
-                                {{ form.message(class="form-control form-control-lg", rows=6, placeholder="Tell me about your project or requirements...") }}
-                                {% if form.message.errors %}
-                                    <div class="text-danger small">{{ form.message.errors[0] }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="col-12 text-center">
-                                {{ form.submit(class="btn btn-primary btn-lg px-5 py-3") }}
-                            </div>
-                        </div>
-                    </form>
-
                     <div class="text-center mt-5">
                         <p class="fs-4 mb-1">📞 <strong>+234 813 887 9938</strong></p>
                         <p class="fs-4">📧 <a href="mailto:helpdesk.ragosa.tech@gmail.com">helpdesk.ragosa.tech@gmail.com</a></p>
                     </div>
-                </div>
             </div>
         </div>
     </section>
@@ -820,28 +803,127 @@
         <p class="text-muted small mt-2">Built with passion in Lagos, Nigeria</p>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Keep Bootstrap and Toastify -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
-    <script>
-        // Preloader
-        window.addEventListener('load', () => {
-            const loader = document.getElementById('page-loader');
-            loader.classList.add('hidden');
-            document.body.classList.add('loaded');
-            setTimeout(() => loader.remove(), 1000);
+<!-- Custom success chime -->
+<audio id="successChime" preload="auto">
+    <source src="static/success-chime.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+
+<script>
+    // 1. Preloader (unchanged)
+    window.addEventListener('load', () => {
+        const loader = document.getElementById('page-loader');
+        loader.classList.add('hidden');
+        document.body.classList.add('loaded');
+        setTimeout(() => loader.remove(), 1000);
+    });
+
+    // 2. Image animation observer (unchanged)
+    const imgObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animated');
+                imgObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.dashboard-img').forEach(img => imgObserver.observe(img));
+
+    // 3. Loading overlay + success chime logic
+    document.addEventListener('DOMContentLoaded', function () {
+        const successChime = document.getElementById('successChime');
+        const loadingOverlay = document.getElementById('loading-overlay');
+
+        // Show loading overlay on ANY form submit (request form, etc.)
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                // Only show if form is valid
+                if (!form.checkValidity()) return;
+                loadingOverlay?.classList.add('show');
+            });
         });
 
-        // Image animation observer
-        const imgObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('animated');
-                    imgObserver.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.15 });
+        // Hide loading overlay when page is shown (after redirect or back/forward)
+        window.addEventListener('pageshow', () => {
+            loadingOverlay?.classList.remove('show');
+        });
 
-        document.querySelectorAll('.dashboard-img').forEach(img => imgObserver.observe(img));
-    </script>
+        // =============================================
+        // Toastify + Chime for flashed messages (SUCCESS plays chime)
+        // =============================================
+        const flashedMessages = {{ get_flashed_messages(with_categories=true) | tojson | safe }};
+
+        if (flashedMessages && flashedMessages.length > 0) {
+            flashedMessages.forEach(([category, message]) => {
+                let bgColor = '#28a745';
+                let textColor = '#ffffff';
+
+                switch (category.toLowerCase()) {
+                    case 'success':
+                        bgColor = '#28a745';
+                        textColor = '#ffffff';
+                        // Play chime NOW — this should work after redirect because user already interacted
+                        successChime.currentTime = 0;
+                        successChime.volume = 0.7;
+                        successChime.play().then(() => {
+                            console.log("Success chime played");
+                        }).catch(e => {
+                            console.warn("Chime blocked (expected on first load):", e);
+                        });
+                        break;
+                    case 'danger':
+                    case 'error':
+                        bgColor = '#dc3545';
+                        break;
+                    case 'warning':
+                        bgColor = '#ffc107';
+                        textColor = '#212529';
+                        break;
+                    case 'info':
+                        bgColor = '#17a2b8';
+                        break;
+                    default:
+                        bgColor = '#6c757d';
+                }
+
+                Toastify({
+                    text: message,
+                    duration: 6000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    stopOnFocus: true,
+                    style: {
+                        background: bgColor,
+                        color: textColor,
+                        borderRadius: "12px",
+                        boxShadow: "0 8px 25px rgba(0,0,0,0.3)",
+                        fontFamily: "'Segoe UI', system-ui, sans-serif",
+                        fontSize: "16px",
+                        fontWeight: "500",
+                        padding: "18px 30px",
+                        maxWidth: "450px"
+                    },
+                    offset: { x: 40, y: 120 }
+                }).showToast();
+            });
+        }
+
+        // Optional: Unlock audio on first real interaction (fallback for strict browsers)
+        function unlockAudio() {
+            successChime.play().catch(() => {});
+            successChime.pause();
+            document.removeEventListener('click', unlockAudio);
+            document.removeEventListener('touchstart', unlockAudio);
+        }
+        document.addEventListener('click', unlockAudio, { once: true });
+        document.addEventListener('touchstart', unlockAudio, { once: true });
+    });
+</script>
 </body>
 </html>

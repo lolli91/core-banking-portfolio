@@ -1,3 +1,9 @@
 flask-wtf
 email-validator
 flask-bootstrap
+pyotp
+qrcode[pil]
+werkzeug
+flask-login
+bleach
+flask-migrate

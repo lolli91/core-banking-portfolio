@@ -1,0 +1,12 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Rago Global Solutions//EN
+BEGIN:VEVENT
+UID:496b561d-9f21-4a26-b0dd-049adfde3cfa
+SUMMARY:Core Banking POC - Rago Global Solutions
+DTSTART:20260223T025500
+DTEND:20260223T035500
+DESCRIPTION:POC Session with GBT Microfinance Bank\nContact: Kelvin Jerry (tnggmusicalcrew@gmail.com)\nPhone: 08138879938\n\nPlease be prepared with any questions or requirements.\nJoin via the link or details that will be shared closer to the time.
+LOCATION:Online / Virtual Meeting
+END:VEVENT
+END:VCALENDAR
