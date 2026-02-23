@@ -34,7 +34,16 @@ app = Flask(__name__,
             static_folder='../static')
 
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY") or os.urandom(32).hex()
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL", "sqlite:///rago_app.db")
+
+# Temporary Vercel fix: SQLite in /tmp (writable on serverless)
+import os
+if os.getenv("VERCEL"):  # Vercel sets this env var automatically
+    db_path = "/tmp/rago_app.db"
+else:
+    db_path = "rago_app.db"  # local SQLite file
+
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL", f"sqlite:///{db_path}")
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SECURE'] = os.getenv("FLASK_ENV", "development") == "production"
@@ -42,7 +51,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=14)
 
 db = SQLAlchemy(app)
 
-# NOW initialize Migrate — AFTER app and db are created
+# Initialize Migrate — AFTER db is created
 migrate = Migrate(app, db)
 
 # Flask-Login setup
