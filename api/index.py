@@ -26,27 +26,24 @@ from email import encoders
 # =========================
 load_dotenv()
 
-# =========================
-# APP CONFIGURATION
-# =========================
 app = Flask(__name__,
             template_folder='../templates',
             static_folder='../static')
 
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY") or os.urandom(32).hex()
 
-# ── TEMPORARY VERCEL SQLITE FIX ──
-# Use /tmp (only writable location in Vercel serverless functions)
-# WARNING: Database WILL RESET on cold starts, redeploys, scaling — only for testing!
+# ── VERCEL READONLY SQLITE EMERGENCY FIX ──
+# Force database into /tmp (only writable path in Vercel)
 import os
 if 'VERCEL' in os.environ:
-    db_path = '/tmp/rago_app.db'
-    print("[VERCEL] Using writable /tmp for SQLite → should fix readonly error")
+    db_path = '/tmp/rago_temp.db'
+    print("!!! VERCEL DETECTED !!! Using /tmp/rago_temp.db to bypass readonly filesystem")
+    print("WARNING: This DB resets on every cold start/redeploy - data is NOT persistent")
 else:
     db_path = 'rago_app.db'
-    print("[LOCAL] Using project folder for SQLite")
+    print("Local environment - using normal SQLite file")
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL", f"sqlite:///{db_path}")
+app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{db_path}"
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SESSION_COOKIE_HTTPONLY'] = True
@@ -55,10 +52,8 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=14)
 
 db = SQLAlchemy(app)
 
-# Initialize Migrate AFTER db
 migrate = Migrate(app, db)
 
-# Flask-Login
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'admin_login'
