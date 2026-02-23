@@ -36,16 +36,15 @@ app = Flask(__name__,
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY") or os.urandom(32).hex()
 
 # ── TEMPORARY VERCEL SQLITE FIX ──
-# Use /tmp (only writable folder on Vercel serverless)
-# WARNING: Database WILL RESET on every cold start / redeploy
-# This is ONLY for testing — switch to PostgreSQL/Neon soon!
+# Use /tmp (only writable location in Vercel serverless functions)
+# WARNING: Database WILL RESET on cold starts, redeploys, scaling — only for testing!
 import os
-if 'VERCEL' in os.environ:           # Vercel sets this automatically
+if 'VERCEL' in os.environ:
     db_path = '/tmp/rago_app.db'
-    print("Vercel detected → using writable /tmp for SQLite")
+    print("[VERCEL] Using writable /tmp for SQLite → should fix readonly error")
 else:
-    db_path = 'rago_app.db'          # local dev file
-    print("Local dev → using project folder for SQLite")
+    db_path = 'rago_app.db'
+    print("[LOCAL] Using project folder for SQLite")
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL", f"sqlite:///{db_path}")
 
