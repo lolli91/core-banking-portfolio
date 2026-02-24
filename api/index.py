@@ -26,24 +26,21 @@ from email import encoders
 # =========================
 load_dotenv()
 
+# =========================
+# APP CONFIGURATION
+# =========================
 app = Flask(__name__,
             template_folder='../templates',
             static_folder='../static')
 
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY") or os.urandom(32).hex()
 
-# ── VERCEL READONLY SQLITE EMERGENCY FIX ──
-# Force database into /tmp (only writable path in Vercel)
-import os
-if 'VERCEL' in os.environ:
-    db_path = '/tmp/rago_temp.db'
-    print("!!! VERCEL DETECTED !!! Using /tmp/rago_temp.db to bypass readonly filesystem")
-    print("WARNING: This DB resets on every cold start/redeploy - data is NOT persistent")
-else:
-    db_path = 'rago_app.db'
-    print("Local environment - using normal SQLite file")
-
-app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{db_path}"
+# PostgreSQL (Neon) on Vercel / production
+# Local fallback to SQLite only if DATABASE_URL not set
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
+    "DATABASE_URL",
+    "sqlite:///rago_app.db"  # only used when running locally without env var
+)
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SESSION_COOKIE_HTTPONLY'] = True
