@@ -20,6 +20,16 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
+import cloudinary
+import cloudinary.uploader
+
+# Load Cloudinary credentials from Vercel env vars (secure)
+cloudinary.config(
+    cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key = os.getenv("CLOUDINARY_API_KEY"),
+    api_secret = os.getenv("CLOUDINARY_API_SECRET"),
+    secure = True
+)
 
 # =========================
 # LOAD ENVIRONMENT VARIABLES
@@ -823,7 +833,7 @@ def request_demo():
     form = PublicDemoForm()
 
     if form.validate_on_submit():
-        # === Prepare form data ===
+        # Prepare form data (no local filename needed anymore)
         form_data = {
             'organization': form.organization.data,
             'contact_person': form.contact_person.data,
@@ -832,19 +842,28 @@ def request_demo():
             'description': form.description.data,
             'request_type': form.request_type.data,
             'scheduled_date': form.scheduled_date.data.isoformat() if form.scheduled_date.data else None,
-            'attachment_filename': None,  # handle attachment separately below
+            'attachment_url': None,  # Will store Cloudinary secure_url if uploaded
         }
 
-        # === Handle attachment ===
-        attachment_path = None
+        # Handle attachment upload to Cloudinary (only for POC requests)
         if form.attachment.data and form.request_type.data == 'POC':
-            filename = secure_filename(form.attachment.data.filename)
-            attachment_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            form.attachment.data.save(attachment_path)
-            form_data['attachment_filename'] = filename
-            form_data['attachment_path'] = attachment_path  # temporary, for later use
+            try:
+                upload_result = cloudinary.uploader.upload(
+                    form.attachment.data,
+                    folder="rago-attachments",          # Optional: organizes files in Cloudinary dashboard
+                    resource_type="auto",               # Auto-detects PDF, image, etc.
+                    use_filename=True,                  # Preserves original filename
+                    unique_filename=False,              # Avoids random suffixes
+                    overwrite=True                      # Overwrite if same name exists (optional)
+                )
+                form_data['attachment_url'] = upload_result['secure_url']
+                print(f"[Cloudinary] Uploaded successfully: {form_data['attachment_url']}")
+            except Exception as e:
+                print(f"[Cloudinary Upload Error] {str(e)}")
+                flash("Failed to upload attachment. Please try again without file or contact support.", "danger")
+                return render_template("request_demo.html", form=form, existing_request=None)
 
-        # === Generate verification token ===
+        # Generate secure verification token
         token = token_urlsafe(32)
         verification = RequestVerificationToken(
             token=token,
@@ -854,7 +873,7 @@ def request_demo():
         db.session.add(verification)
         db.session.commit()
 
-        # === Send verification email ===
+        # Send verification email
         verify_url = url_for('verify_request', token=token, _external=True)
 
         verification_html = f"""
@@ -918,21 +937,21 @@ def request_demo():
 
     return render_template("request_demo.html", form=form, existing_request=None)
 
+
 @app.route('/verify-request/<token>')
 def verify_request(token):
     verification = RequestVerificationToken.query.filter_by(token=token, used=False).first()
 
-    if not verification or (datetime.utcnow() - verification.created_at) > timedelta(hours=0.17):
+    if not verification or (datetime.utcnow() - verification.created_at) > timedelta(hours=24):
         flash("This verification link is invalid or has expired. Please submit your request again.", "danger")
         return redirect(url_for('request_demo'))
 
     form_data = verification.form_data
 
-    # === Handle attachment ===
-    attachment_filename = form_data.get('attachment_filename')
-    attachment_path = form_data.get('attachment_path')
+    # Retrieve the Cloudinary URL if it was uploaded
+    attachment_url = form_data.get('attachment_url')  # This is the secure_url from Cloudinary
 
-    # === Find if this is an update (match email + org) ===
+    # Find if this is an update (match email + organization)
     existing_req = POCRequest.query.filter(
         POCRequest.email == form_data['email'],
         POCRequest.organization == form_data['organization'],
@@ -940,7 +959,7 @@ def verify_request(token):
     ).order_by(POCRequest.created_at.desc()).first()
 
     if existing_req:
-        # UPDATE existing
+        # UPDATE existing request
         existing_req.organization = form_data['organization']
         existing_req.contact_person = form_data['contact_person']
         existing_req.email = form_data['email']
@@ -948,15 +967,19 @@ def verify_request(token):
         existing_req.description = form_data['description']
         existing_req.request_type = form_data['request_type']
         existing_req.scheduled_date = datetime.fromisoformat(form_data['scheduled_date']) if form_data.get('scheduled_date') else None
-        if attachment_filename:
-            existing_req.attachment = attachment_filename
+        
+        # Only update attachment if a new one was uploaded
+        if attachment_url:
+            existing_req.attachment = attachment_url  # Store Cloudinary URL
+        
         if existing_req.status in ["Scheduled", "Completed"]:
             existing_req.status = "Pending"
+        
         db.session.commit()
         used_request = existing_req
         is_update = True
     else:
-        # CREATE new
+        # CREATE new request
         new_request = POCRequest(
             organization=form_data['organization'],
             contact_person=form_data['contact_person'],
@@ -965,7 +988,7 @@ def verify_request(token):
             description=form_data['description'],
             request_type=form_data['request_type'],
             scheduled_date=datetime.fromisoformat(form_data['scheduled_date']) if form_data.get('scheduled_date') else None,
-            attachment=attachment_filename,
+            attachment=attachment_url,  # Store Cloudinary URL (or None)
             status="Pending"
         )
         db.session.add(new_request)
@@ -1045,8 +1068,8 @@ def verify_request(token):
         "helpdesk.ragosa.tech@gmail.com",
         admin_subject,
         plain_body=f"{used_request.request_type} {action_word} from {used_request.organization}\n\nDescription:\n{used_request.description}",
-        html_body=admin_html,
-        attachment_path=attachment_path if attachment_path and os.path.exists(attachment_path) else None
+        html_body=admin_html
+        # No attachment_path needed anymore — Cloudinary handles delivery
     )
 
     # Client confirmation email
@@ -1087,7 +1110,7 @@ def verify_request(token):
                     <tr><td><strong>Email:</strong></td><td>{used_request.email}</td></tr>
                     <tr><td><strong>Phone:</strong></td><td>{used_request.phone or 'Not provided'}</td></tr>
                     <tr><td><strong>{time_label}:</strong></td><td>{used_request.scheduled_date.strftime('%A, %d %B %Y at %H:%M') if used_request.scheduled_date else 'Not specified'}</td></tr>
-                    <tr><td><strong>Attachment:</strong></td><td>{used_request.attachment or 'None'}</td></tr>
+                    <tr><td><strong>Attachment:</strong></td><td>{'View here' if used_request.attachment else 'None'}</td></tr>
                 </table>
 
                 <p>{client_body_next}</p>
