@@ -1,6 +1,9 @@
+from io import BytesIO
+from secrets import token_urlsafe
 from flask import Flask, jsonify, render_template, request, flash, redirect, session, url_for
 from flask_wtf import FlaskForm
-from flask_migrate import Migrate  # ← keep this import
+from flask_migrate import Migrate
+import requests
 from wtforms import StringField, TextAreaField, SubmitField, DateTimeLocalField, PasswordField, ValidationError
 from wtforms.validators import DataRequired, Email, Length, Optional
 from flask_sqlalchemy import SQLAlchemy
@@ -20,60 +23,29 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
-import cloudinary
-import cloudinary.uploader
-import requests
-from io import BytesIO
-
-
-# Load Cloudinary credentials from Vercel env vars (secure)
-cloudinary.config(
-    cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME"),
-    api_key = os.getenv("CLOUDINARY_API_KEY"),
-    api_secret = os.getenv("CLOUDINARY_API_SECRET"),
-    secure = True
-)
-
-def get_signed_cloudinary_url(public_id, resource_type="image", format=None):
-    if not public_id:
-        return None
-    return cloudinary.utils.cloudinary_url(
-        public_id,
-        resource_type=resource_type,
-        format=format,
-        sign_url=True,
-        expires_at=int((datetime.utcnow() + timedelta(hours=24)).timestamp())
-    )[0]
-
-# =========================
-# LOAD ENVIRONMENT VARIABLES
-# =========================
-load_dotenv()
 
 # =========================
 # APP CONFIGURATION
 # =========================
+load_dotenv()
+
 app = Flask(__name__,
             template_folder='../templates',
             static_folder='../static')
 
-app.jinja_env.globals['get_signed_cloudinary_url'] = get_signed_cloudinary_url
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY") or os.urandom(32).hex()
-
-# PostgreSQL (Neon) on Vercel / production
-# Local fallback to SQLite only if DATABASE_URL not set
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
-    "DATABASE_URL",
-    "sqlite:///rago_app.db"  # only used when running locally without env var
-)
-
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL", "sqlite:///rago_app.db")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SECURE'] = os.getenv("FLASK_ENV", "development") == "production"
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=14)
 
-db = SQLAlchemy(app)
+# Local upload folder (persistent on PythonAnywhere)
+UPLOAD_FOLDER = os.path.join(app.static_folder, 'uploads')
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 login_manager = LoginManager()
@@ -82,9 +54,7 @@ login_manager.login_view = 'admin_login'
 login_manager.login_message = "Please log in to access this page."
 login_manager.login_message_category = "warning"
 
-# =========================
-# EMAIL CONFIG
-# =========================
+# Email config (Gmail SMTP works on free tier)
 app.config['MAIL_SERVER'] = os.getenv("MAIL_SERVER", "smtp.gmail.com")
 app.config['MAIL_PORT'] = int(os.getenv("MAIL_PORT", 587))
 app.config['MAIL_USE_TLS'] = os.getenv("MAIL_USE_TLS", "True") == "True"
@@ -326,6 +296,7 @@ def role_required(*required_roles):
 # =========================
 # EMAIL UTILITIES
 # =========================
+# Updated EMAIL UTILITIES - uses local path directly
 def send_email(to_email, subject, plain_body, html_body=None, attachment_path=None, extra_attachment=None):
     if not app.config.get('MAIL_USERNAME') or not app.config.get('MAIL_PASSWORD'):
         print("Email credentials not configured.")
@@ -337,14 +308,11 @@ def send_email(to_email, subject, plain_body, html_body=None, attachment_path=No
         msg['To'] = to_email
         msg['Subject'] = subject
 
-        # Plain text version (fallback)
         msg.attach(MIMEText(plain_body, 'plain'))
-
-        # HTML version (preferred)
         if html_body:
             msg.attach(MIMEText(html_body, 'html'))
 
-        # Handle main attachment (ICS)
+        # Main attachment (e.g. ICS)
         if attachment_path and os.path.exists(attachment_path):
             part = MIMEBase('application', "octet-stream")
             with open(attachment_path, 'rb') as f:
@@ -353,7 +321,7 @@ def send_email(to_email, subject, plain_body, html_body=None, attachment_path=No
             part.add_header('Content-Disposition', f'attachment; filename="{os.path.basename(attachment_path)}"')
             msg.attach(part)
 
-        # Handle extra attachment (PDF/Excel/Word/image)
+        # Extra attachment (client uploaded file)
         if extra_attachment and os.path.exists(extra_attachment):
             part2 = MIMEBase('application', "octet-stream")
             with open(extra_attachment, 'rb') as f:
@@ -855,12 +823,16 @@ def update_status(id):
     flash(f"Status updated to {new_status}. Client and admin notified.", "success")
     return redirect(url_for('dashboard'))
 
-UPLOAD_FOLDER = 'static/uploads'
+# ────────────────────────────────────────────────
+# Local Upload Folder Setup (persistent on PythonAnywhere)
+# ────────────────────────────────────────────────
+UPLOAD_FOLDER = os.path.join(app.static_folder, 'uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-from secrets import token_urlsafe  # for secure token generation
-
+# ────────────────────────────────────────────────
+# /request-demo - Client submits POC/Demo/Enquiry
+# ────────────────────────────────────────────────
 @app.route('/request-demo', methods=['GET', 'POST'])
 def request_demo():
     form = PublicDemoForm()
@@ -875,27 +847,16 @@ def request_demo():
             'description': form.description.data,
             'request_type': form.request_type.data,
             'scheduled_date': form.scheduled_date.data.isoformat() if form.scheduled_date.data else None,
-            'attachment_url': None,  # Will store Cloudinary secure_url if uploaded
+            'attachment_filename': None,
         }
 
-        # Handle attachment upload to Cloudinary (only for POC)
+        # Save attachment locally if POC
         if form.attachment.data and form.request_type.data == 'POC':
-            try:
-                upload_result = cloudinary.uploader.upload(
-                    form.attachment.data,
-                    folder="rago-attachments",
-                    resource_type="auto",
-                    use_filename=True,
-                    unique_filename=False,
-                    overwrite=True,
-                    type="upload",
-                    access_mode="public"
-                )
-                form_data['attachment_url'] = upload_result['secure_url']
-                print(f"[Cloudinary] Uploaded publicly: {form_data['attachment_url']}")
-            except Exception as e:
-                print(f"[Cloudinary Upload Error] {str(e)}")
-                flash("Failed to upload attachment. Request submitted without file.", "warning")
+            filename = secure_filename(form.attachment.data.filename)
+            save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            form.attachment.data.save(save_path)
+            form_data['attachment_filename'] = filename
+            print(f"[Upload] Saved attachment: {save_path}")
 
         # Generate verification token
         token = token_urlsafe(32)
@@ -907,15 +868,11 @@ def request_demo():
         db.session.add(verification)
         db.session.commit()
 
-        # Prepare attachment for verification email
-        verification_attachment = None
-        if form_data.get('attachment_url'):
-            verification_attachment = download_file_from_url(
-                form_data['attachment_url'],
-                fallback_filename=f"POC_supporting_doc_{form_data['organization']}.pdf"
-            )
+        # Prepare attachment path for email
+        attachment_path = None
+        if form_data.get('attachment_filename'):
+            attachment_path = os.path.join(app.config['UPLOAD_FOLDER'], form_data['attachment_filename'])
 
-        # Send verification email with attachment if present
         verify_url = url_for('verify_request', token=token, _external=True)
 
         verification_html = f"""
@@ -972,16 +929,18 @@ def request_demo():
             f"Verify Your {form.request_type.data} Request - Rago Global Solutions",
             plain_body=f"Click here to verify: {verify_url}\n\nThis link expires in 24 hours.\n\nYour supporting document (if uploaded) is attached.",
             html_body=verification_html,
-            attachment_path=None,
-            extra_attachment=verification_attachment
+            attachment_path=attachment_path
         )
 
-        flash("Thank you! We've sent a verification email to your address with any uploaded document attached. Please check your inbox (and spam folder) and click the link to confirm your request.", "info")
+        flash("Thank you! We've sent a verification email with any uploaded document attached. Check your inbox/spam.", "info")
         return redirect(url_for('home'))
 
     return render_template("request_demo.html", form=form, existing_request=None)
 
 
+# ────────────────────────────────────────────────
+# /verify-request/<token> - Verify & save to DB
+# ────────────────────────────────────────────────
 @app.route('/verify-request/<token>')
 def verify_request(token):
     verification = RequestVerificationToken.query.filter_by(token=token, used=False).first()
@@ -991,11 +950,9 @@ def verify_request(token):
         return redirect(url_for('request_demo'))
 
     form_data = verification.form_data
+    attachment_filename = form_data.get('attachment_filename')
 
-    # Retrieve Cloudinary URL if uploaded
-    attachment_url = form_data.get('attachment_url')
-
-    # Find if this is an update (match email + organization)
+    # Check for existing request (update if same email + org)
     existing_req = POCRequest.query.filter(
         POCRequest.email == form_data['email'],
         POCRequest.organization == form_data['organization'],
@@ -1003,7 +960,6 @@ def verify_request(token):
     ).order_by(POCRequest.created_at.desc()).first()
 
     if existing_req:
-        # UPDATE existing
         existing_req.organization = form_data['organization']
         existing_req.contact_person = form_data['contact_person']
         existing_req.email = form_data['email']
@@ -1011,18 +967,14 @@ def verify_request(token):
         existing_req.description = form_data['description']
         existing_req.request_type = form_data['request_type']
         existing_req.scheduled_date = datetime.fromisoformat(form_data['scheduled_date']) if form_data.get('scheduled_date') else None
-        
-        if attachment_url:
-            existing_req.attachment = attachment_url
-        
+        if attachment_filename:
+            existing_req.attachment = attachment_filename
         if existing_req.status in ["Scheduled", "Completed"]:
             existing_req.status = "Pending"
-        
         db.session.commit()
         used_request = existing_req
         is_update = True
     else:
-        # CREATE new
         new_request = POCRequest(
             organization=form_data['organization'],
             contact_person=form_data['contact_person'],
@@ -1031,7 +983,7 @@ def verify_request(token):
             description=form_data['description'],
             request_type=form_data['request_type'],
             scheduled_date=datetime.fromisoformat(form_data['scheduled_date']) if form_data.get('scheduled_date') else None,
-            attachment=attachment_url,
+            attachment=attachment_filename,
             status="Pending"
         )
         db.session.add(new_request)
@@ -1039,19 +991,14 @@ def verify_request(token):
         used_request = new_request
         is_update = False
 
-    # Mark token as used
     verification.used = True
     db.session.commit()
 
-    # Prepare attachment for both emails (download once)
-    email_attachment = None
+    # Prepare attachment path for emails
+    attachment_path = None
     if used_request.attachment:
-        email_attachment = download_file_from_url(
-            used_request.attachment,
-            fallback_filename=f"{used_request.request_type}_supporting_document_{used_request.organization}.pdf"
-        )
+        attachment_path = os.path.join(app.config['UPLOAD_FOLDER'], used_request.attachment)
 
-    # === Send final emails with real attachment ===
     type_lower = used_request.request_type.lower()
     is_enquiry = used_request.request_type == 'Enquiry'
     action_word = "updated" if is_update else "received"
@@ -1120,8 +1067,7 @@ def verify_request(token):
         admin_subject,
         plain_body=f"{used_request.request_type} {action_word} from {used_request.organization}\n\nDescription:\n{used_request.description}\n\nSupporting document (if any) attached.",
         html_body=admin_html,
-        attachment_path=None,
-        extra_attachment=email_attachment
+        attachment_path=attachment_path
     )
 
     # Client confirmation email
@@ -1190,13 +1136,16 @@ def verify_request(token):
         f"Your {used_request.request_type} Confirmed - Rago Global Solutions",
         plain_body=f"Your request has been verified and received. Supporting document (if uploaded) is attached.\nWe'll be in touch soon.",
         html_body=client_html,
-        attachment_path=None,
-        extra_attachment=email_attachment
+        attachment_path=attachment_path
     )
 
     flash("Thank you! Your email has been verified and your request has been successfully submitted.", "success")
     return redirect(url_for('home'))
 
+
+# ────────────────────────────────────────────────
+# /schedule/<int:id> - Admin schedules & notifies
+# ────────────────────────────────────────────────
 @app.route('/schedule/<int:id>', methods=['GET', 'POST'])
 @login_required
 @role_required('admin', 'viewer')
@@ -1208,34 +1157,25 @@ def schedule_demo(id):
         req.scheduled_date = form.scheduled_date.data
         req.status = "Scheduled"
 
-        # Handle optional new attachment from admin (local temp file)
-        admin_attachment_path = None
+        # Handle optional new attachment from admin (saved locally)
+        admin_attachment_filename = None
         if form.attachment.data:
             filename = secure_filename(form.attachment.data.filename)
-            admin_attachment_path = os.path.join('/tmp', filename)  # Use /tmp on Vercel
-            os.makedirs('/tmp', exist_ok=True)
-            form.attachment.data.save(admin_attachment_path)
+            save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            form.attachment.data.save(save_path)
+            admin_attachment_filename = filename
 
         db.session.commit()
 
         ics_path = generate_ics_file(req)
 
-        # Prepare email attachments
-        ics_file_obj = None
-        client_attachment_obj = None
-
-        # ICS file (always attach)
-        if os.path.exists(ics_path):
-            ics_file_obj = open(ics_path, 'rb')
-
-        # Original client attachment (download from Cloudinary if exists)
+        # Prepare attachment paths
+        ics_attachment = ics_path if os.path.exists(ics_path) else None
+        client_attachment = None
         if req.attachment:
-            client_attachment_obj = download_file_from_url(
-                req.attachment,
-                fallback_filename=f"{req.request_type}_original_{req.organization}.pdf"
-            )
+            client_attachment = os.path.join(app.config['UPLOAD_FOLDER'], req.attachment)
 
-        # Customized HTML email
+        # Email body
         html_body = f"""
         <!DOCTYPE html>
         <html>
@@ -1275,7 +1215,7 @@ def schedule_demo(id):
                         <tr><td><strong>Attachments:</strong></td><td>Calendar invite + any supporting documents attached</td></tr>
                     </table>
 
-                    <p>Please find the calendar invite (.ics file) and any uploaded supporting documents attached to this email — add the event to your calendar to avoid missing the session.</p>
+                    <p>Please find the calendar invite (.ics file) and any uploaded supporting documents attached to this email — add it to your calendar to avoid missing the session.</p>
 
                     <p>We’re looking forward to { 
                         'showing you the platform and answering all your questions' 
@@ -1319,18 +1259,15 @@ def schedule_demo(id):
             f"Your {req.request_type} Scheduled – Rago Global Solutions",
             plain_body=plain_body,
             html_body=html_body,
-            attachment_path=ics_path if ics_file_obj else None,
-            extra_attachment=client_attachment_obj
+            attachment_path=ics_attachment,           # ICS file
+            extra_attachment=client_attachment        # Client's original file
         )
 
-        # Cleanup temp files
-        if ics_file_obj:
-            ics_file_obj.close()
-            os.remove(ics_path)
-        if admin_attachment_path and os.path.exists(admin_attachment_path):
-            os.remove(admin_attachment_path)
+        # Optional: clean up ICS file after sending
+        if ics_attachment and os.path.exists(ics_attachment):
+            os.remove(ics_attachment)
 
-        flash(f"{req.request_type} scheduled and notification (with attachments) sent to client successfully.", "success")
+        flash(f"{req.request_type} scheduled and notification (with attachments) sent successfully.", "success")
         return redirect(url_for('dashboard'))
 
     return render_template("schedule.html", form=form, request=req)
