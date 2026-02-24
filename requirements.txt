@@ -35,3 +35,5 @@ webencodings==0.5.1
 Werkzeug==3.1.4
 WTForms==3.2.1
 xlsxwriter==3.2.9
+psycopg2-binary>=2.9.9
+gunicorn==22.0.0
