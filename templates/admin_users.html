@@ -6,7 +6,6 @@
     <title>Manage Users - Rago Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
         body { background: #f1f5f9; font-family: system-ui, sans-serif; min-height: 100vh; }
@@ -18,10 +17,19 @@
             color: rgba(255,255,255,0.8); display: block; padding: 0.75rem 1.5rem; 
             text-decoration: none; transition: all 0.2s;
         }
-        .sidebar a:hover { background: #1e293b; color: white; }
+        .sidebar a:hover, .sidebar a.active { background: #1e293b; color: white; }
         .main-content { margin-left: 260px; padding: 2rem; }
         .card { border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        .btn-sm { font-size: 0.85rem; padding: 0.2rem 0.4rem; }
+        .btn-sm { font-size: 0.85rem; padding: 0.35rem 0.75rem; }
+        .role-badge {
+            font-size: 0.8rem;
+            padding: 0.4em 0.9em;
+            font-weight: 500;
+        }
+        .protected-account {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
         @media (max-width: 992px) { 
             .sidebar { width: 100%; height: auto; position: relative; } 
             .main-content { margin-left: 0; } 
@@ -36,7 +44,7 @@
             <h4>Rago Admin</h4>
         </div>
         <a href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a>
-        <a href="{{ url_for('manage_users') }}"><i class="fas fa-users me-2"></i> Users</a>
+        <a href="{{ url_for('manage_users') }}" class="active"><i class="fas fa-users me-2"></i> Users</a>
         <a href="#"><i class="fas fa-cog me-2"></i> Settings</a>
         <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
     </div>
@@ -45,7 +53,7 @@
     <div class="main-content">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="fw-bold">Manage Users</h1>
-            {% if current_user.role == 'admin' %}
+            {% if current_user.role in ['admin', 'superadmin'] %}
             <a href="{{ url_for('create_user') }}" class="btn btn-primary">
                 <i class="fas fa-user-plus me-2"></i> Create New User
             </a>
@@ -69,12 +77,12 @@
                     <table class="table table-hover mb-0 align-middle">
                         <thead class="table-dark">
                             <tr>
-                                <th>ID</th>
+                                <th>Full Name</th>
                                 <th>Username</th>
                                 <th>Email</th>
-                                <th>Role</th>
+                                <th>Role / Function</th>
                                 <th>Created</th>
-                                {% if current_user.role == 'admin' %}
+                                {% if current_user.role in ['admin', 'superadmin'] %}
                                 <th>Actions</th>
                                 {% endif %}
                             </tr>
@@ -82,36 +90,61 @@
                         <tbody>
                             {% if users %}
                                 {% for user in users %}
-                                <tr>
-                                    <td>{{ user.id }}</td>
+                                <tr class="{% if user.username == 'admin' %}protected-account{% endif %}">
+                                    <td>
+                                        <strong>{{ user.full_name or user.username }}</strong>
+                                        {% if user.full_name %}
+                                            <small class="text-muted d-block">(@{{ user.username }})</small>
+                                        {% endif %}
+                                        {% if user.id == current_user.id %}
+                                            <span class="badge bg-success ms-2">You</span>
+                                        {% endif %}
+                                        {% if user.username == 'admin' %}
+                                            <span class="badge bg-warning ms-2">Protected</span>
+                                        {% endif %}
+                                    </td>
                                     <td>{{ user.username }}</td>
                                     <td>{{ user.email }}</td>
                                     <td>
-                                        <span class="badge bg-{{ 'success' if user.role == 'admin' else 'info' }}">
-                                            {{ user.role | capitalize }}
+                                        <span class="role-badge bg-{{
+                                            'warning' if user.role == 'superadmin' else
+                                            'primary' if user.role == 'admin' else
+                                            'info' if user.role == 'team' else
+                                            'secondary' if user.role == 'viewer' else
+                                            'dark'
+                                        }} text-white">
+                                            {{ user.role | replace('_', ' ') | title }}
                                         </span>
                                     </td>
                                     <td>{{ user.created_at.strftime('%d %b %Y %H:%M') }}</td>
-                                    {% if current_user.role == 'admin' %}
+                                    {% if current_user.role in ['admin', 'superadmin'] %}
                                     <td>
-                                        <a href="{{ url_for('edit_user', user_id=user.id) }}" class="btn btn-sm btn-outline-primary me-1">
-                                            <i class="fas fa-edit"></i> Edit
-                                        </a>
-                                        {% if user.id != current_user.id %}
-                                        <form action="{{ url_for('delete_user', user_id=user.id) }}" method="POST" style="display:inline;">
-                                            <button type="submit" class="btn btn-sm btn-outline-danger swal-delete"
-                                                    data-username="{{ user.username }}">
-                                                <i class="fas fa-trash-alt"></i> Delete
-                                            </button>
-                                        </form>
-                                        {% endif %}
+                                        <div class="btn-group btn-group-sm">
+                                            {% if user.username != 'admin' or current_user.username == 'admin' %}
+                                                <a href="{{ url_for('edit_user', user_id=user.id) }}" 
+                                                   class="btn btn-outline-primary">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </a>
+                                            {% endif %}
+
+                                            {% if current_user.role == 'superadmin' and user.id != current_user.id and user.username != 'admin' %}
+                                            <form action="{{ url_for('delete_user', user_id=user.id) }}" method="POST" 
+                                                  class="d-inline delete-form">
+                                                <button type="submit" class="btn btn-outline-danger swal-delete"
+                                                        data-username="{{ user.username }}">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
+                                            </form>
+                                            {% endif %}
+                                        </div>
                                     </td>
                                     {% endif %}
                                 </tr>
                                 {% endfor %}
                             {% else %}
                                 <tr>
-                                    <td colspan="{% if current_user.role == 'admin' %}6{% else %}5{% endif %}" class="text-center py-5 text-muted">
+                                    <td colspan="{% if current_user.role in ['admin', 'superadmin'] %}6{% else %}5{% endif %}" 
+                                        class="text-center py-5 text-muted">
                                         <i class="fas fa-users-slash fs-1 d-block mb-3"></i>
                                         No users found.
                                     </td>
@@ -124,7 +157,10 @@
         </div>
     </div>
 
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         document.querySelectorAll('.swal-delete').forEach(btn => {
             btn.addEventListener('click', function(e) {

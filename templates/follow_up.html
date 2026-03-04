@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Follow-up on Existing Request - Rago Global Solutions</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <style>
+        body { background: linear-gradient(135deg, #f0f4f8, #e2e8f0); min-height: 100vh; font-family: 'Segoe UI', sans-serif; padding-top: 80px; }
+        .request-card { background: white; border-radius: 16px; box-shadow: 0 10px 35px rgba(0,0,0,0.1); max-width: 1100px; margin: 2rem auto; overflow: hidden; }
+        .card-header { background: #001f3f; color: white; padding: 3rem 2rem 2rem; text-align: center; }
+        .card-body { padding: 2.5rem; }
+        .step-section { margin-bottom: 2rem; padding: 1.5rem; border-radius: 12px; background: #f8f9fa; border: 1px solid #dee2e6; }
+        .hidden { display: none !important; }
+        .table th { background: #001f3f; color: white; }
+        .btn-primary { background: #007BFF; border: none; }
+        .form-section-title { color: #001f3f; font-weight: 700; margin-bottom: 1.5rem; }
+
+        /* Loading spinner */
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        .spinner-border {
+            width: 4rem;
+            height: 4rem;
+            border-width: .6em;
+        }
+
+        /* Toastify styling - matching dashboard */
+        .Toastify__toast {
+            border-radius: 10px !important;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2) !important;
+            font-family: 'Segoe UI', sans-serif !important;
+            font-size: 16px !important;
+            padding: 16px 24px !important;
+            max-width: 420px !important;
+        }
+        .Toastify__toast--success {
+            background: #28a745 !important;
+            color: white !important;
+        }
+        .Toastify__close-button {
+            color: white !important;
+            opacity: 0.9 !important;
+            font-size: 1.6rem !important;
+            padding: 10px !important;
+        }
+        .Toastify__close-button:hover {
+            opacity: 1 !important;
+        }
+        .toast-content {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .toast-icon {
+            font-size: 2rem;
+        }
+        .toast-text {
+            flex: 1;
+        }
+        .toast-title {
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin-bottom: 6px;
+        }
+        .toast-body {
+            font-size: 1rem;
+            opacity: 0.95;
+        }
+
+        /* Description button styling */
+        .btn-view-desc {
+            white-space: nowrap;
+        }
+        #descModal .modal-body {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .otp-container {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 2rem 0;
+        }
+
+        .otp-input {
+            width: 60px;
+            height: 70px;
+            font-size: 2.1rem;
+            font-weight: bold;
+            text-align: center;
+            border: 2px solid rgba(0, 0, 0, 0.12);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.06);
+            transition: all 0.2s ease;
+            color: #1e293b;
+        }
+
+        .otp-input:focus {
+            border-color: #007BFF;
+            box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.25);
+            background: white;
+            outline: none;
+        }
+
+        .otp-input::-webkit-outer-spin-button,
+        .otp-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .timer {
+            font-size: 1.15rem;
+            font-weight: 500;
+            color: #334155;
+        }
+
+        .timer.expired {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #007BFF, #0056b3);
+            border: none;
+            box-shadow: 0 6px 20px rgba(0,123,255,0.3);
+            transition: all 0.25s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0,123,255,0.4);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Spinner -->
+    <div class="loading-overlay" id="loadingSpinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Description Modal (reusable) -->
+    <div class="modal fade" id="descModal" tabindex="-1" aria-labelledby="descModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="descModalLabel">Request Description</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modalDescContent">
+                    <!-- Description will be injected here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background: #001f3f;">
+        <div class="container-fluid px-4 px-lg-5">
+            <a class="navbar-brand" href="{{ url_for('home') }}">Rago Global Solutions</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('request_demo') }}">
+                            <i class="fas fa-arrow-left me-1"></i> Back to Request
+                        </a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('home') }}">Home</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="request-card card">
+            <div class="card-header">
+                <h3>Follow-up on Existing Request</h3>
+                <p>Reply to your ticket or ask additional questions</p>
+            </div>
+
+            <div class="card-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- Step 1: Lookup -->
+                <div class="step-section {% if step != 'lookup' %}hidden{% endif %}" id="step-lookup">
+                    <h5 class="form-section-title">Step 1: Enter Your Ticket ID</h5>
+                    <form method="POST" novalidate id="lookupForm">
+                        {{ lookup_form.hidden_tag() }}
+                        <div class="input-group input-group-lg mb-3">
+                            {{ lookup_form.reference_id(class="form-control", placeholder="e.g. REF-0012345678") }}
+                            <button class="btn btn-primary" type="submit" name="submit_lookup">
+                                <i class="fas fa-arrow-right me-2"></i> Next
+                            </button>
+                        </div>
+                        {% if lookup_form.reference_id.errors %}
+                            <div class="text-danger">{{ lookup_form.reference_id.errors[0] }}</div>
+                        {% endif %}
+                    </form>
+                </div>
+
+                <!-- Step 2: OTP Verification -->
+                <div class="step-section {% if step != 'verify' %}hidden{% endif %}" id="step-verify">
+                    <h5 class="form-section-title">Step 2: Enter Verification Code</h5>
+                    <p class="text-muted mb-4 text-center">
+                        We sent a 6-digit code to<br>
+                        <strong>{{ followup_email or session.followup_email or 'your email' }}</strong>
+                    </p>
+
+                    <form method="POST" novalidate id="otpForm">
+                        {{ otp_form.hidden_tag() }}
+
+                        <!-- Hidden field that collects all digits -->
+                        {{ otp_form.otp(type="hidden", id="otpCombined") }}
+
+                        <div class="otp-container d-flex justify-content-center gap-3 mb-4">
+                            <input type="text" class="otp-input" maxlength="1" pattern="[0-9]*" inputmode="numeric" autocomplete="one-time-code" required autofocus>
+                            <input type="text" class="otp-input" maxlength="1" pattern="[0-9]*" inputmode="numeric" required>
+                            <input type="text" class="otp-input" maxlength="1" pattern="[0-9]*" inputmode="numeric" required>
+                            <input type="text" class="otp-input" maxlength="1" pattern="[0-9]*" inputmode="numeric" required>
+                            <input type="text" class="otp-input" maxlength="1" pattern="[0-9]*" inputmode="numeric" required>
+                            <input type="text" class="otp-input" maxlength="1" pattern="[0-9]*" inputmode="numeric" required>
+                        </div>
+
+                        {% if otp_form.otp.errors %}
+                            <div class="text-danger text-center mb-3">
+                                {{ otp_form.otp.errors[0] }}
+                            </div>
+                        {% endif %}
+
+                        <!-- Timer -->
+                        <div class="timer text-center mb-4" id="timer">
+                            Code expires in <span id="timeDisplay">10:00</span>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" name="submit_otp" class="btn btn-primary btn-lg" id="submitBtn" disabled>
+                                <i class="fas fa-shield-check me-2"></i> Verify Code
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Resend link -->
+                    <div class="text-center mt-4">
+                        <button class="btn btn-outline-secondary btn-sm" id="resendOtpBtn" disabled>
+                            Resend code (<span id="resendCountdown">30</span>s)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Show Requests + Message Form -->
+                <div class="{% if step != 'message' %}hidden{% endif %}" id="step-message">
+                    {% if existing_requests %}
+                        <h5 class="form-section-title">Your Requests (Ticket: {{ reference_id }})</h5>
+                        <div class="table-responsive mb-5">
+                            <table class="table table-bordered table-hover" id="requestsTable">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Organization</th>
+                                        <th>Contact Person</th>
+                                        <th>Phone</th>
+                                        <th>Description</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                        <th>Preferred Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for req in existing_requests %}
+                                    <tr>
+                                        <td>{{ req.request_type }}</td>
+                                        <td>{{ req.organization }}</td>
+                                        <td>{{ req.contact_person }}</td>
+                                        <td>{{ req.phone or '—' }}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-info btn-view-desc"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#descModal"
+                                                    data-description="{{ req.description | e }}">
+                                                <i class="fas fa-eye me-1"></i> View
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-{{
+                                                'success' if req.status in ['Acknowledged','Completed','Scheduled'] else 
+                                                'warning' if req.status=='Pending' else 
+                                                'danger' if req.status=='Declined' else 
+                                                'primary' if req.status=='Follow-up' else 
+                                                'secondary' }}">
+                                                {{ req.status }}
+                                            </span>
+                                        </td>
+                                        <td>{{ req.created_at.strftime('%d %b %Y') }}</td>
+                                        <td>
+                                            {% if req.scheduled_date %}
+                                                {{ req.scheduled_date.strftime('%d %b %Y %H:%M') }}
+                                            {% else %}
+                                                —
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">No previous requests found for this ticket.</div>
+                    {% endif %}
+
+                    <h5 class="form-section-title">Send Your Follow-up Message</h5>
+                    <form method="POST" enctype="multipart/form-data" novalidate id="messageForm">
+                        {{ message_form.hidden_tag() }}
+                        <input type="hidden" name="reference_id" value="{{ reference_id }}">
+
+                        <div class="mb-4">
+                            {{ message_form.message.label(class="form-label") }}
+                            {{ message_form.message(class="form-control", rows=6, placeholder="Type your question, update, or additional information here...") }}
+                            {% if message_form.message.errors %}
+                                <div class="text-danger small mt-1">{{ message_form.message.errors[0] }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            {{ message_form.attachment.label(class="form-label") }}
+                            {{ message_form.attachment(class="form-control") }}
+                            <small class="text-muted">Optional: PDF, Word, Images, ZIP</small>
+                            {% if message_form.attachment.errors %}
+                                <div class="text-danger small mt-1">{{ message_form.attachment.errors[0] }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" name="submit_message" class="btn btn-primary btn-lg px-5 py-3">
+                                Send Message
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <!-- Success chime (same as dashboard) -->
+    <audio id="successChime" preload="auto">
+        <source src="{{ url_for('static', filename='success-chime.mp3') }}" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const successChime = document.getElementById('successChime');
+
+        // ── Loading Spinner ─────────────────────────────────────────────────
+        const loadingOverlay = document.getElementById('loadingSpinner');
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', () => {
+                loadingOverlay.style.display = 'flex';
+            });
+        });
+        window.addEventListener('load', () => {
+            loadingOverlay.style.display = 'none';
+        });
+
+        // ── Resend OTP Countdown ────────────────────────────────────────────
+        const resendBtn = document.getElementById('resendOtpBtn');
+        const countdownEl = document.getElementById('resendCountdown');
+
+        function startResendCountdown() {
+            let timeLeft = 30;
+            countdownEl.textContent = timeLeft;
+            resendBtn.disabled = true;
+            const timer = setInterval(() => {
+                timeLeft--;
+                countdownEl.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    resendBtn.disabled = false;
+                    countdownEl.textContent = '';
+                    resendBtn.innerHTML = '<i class="fas fa-redo me-1"></i> Resend OTP';
+                }
+            }, 1000);
+        }
+
+        if (document.getElementById('step-verify') && !document.getElementById('step-verify').classList.contains('hidden')) {
+            startResendCountdown();
+        }
+
+        if (resendBtn) {
+            resendBtn.addEventListener('click', () => {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '{{ url_for("follow_up") }}';
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'resend_otp';
+                input.value = 'true';
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            });
+        }
+
+        // ── Toastify success message ────────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('msg_sent') === '1') {
+                successChime.currentTime = 0;
+                successChime.volume = 0.6;
+                successChime.play().catch(e => console.warn("Chime blocked:", e));
+
+                Toastify({
+                    text: `
+                        <div class="toast-content">
+                            <i class="fas fa-check-circle toast-icon"></i>
+                            <div class="toast-text">
+                                <div class="toast-title">Message Sent Successfully!</div>
+                                <div class="toast-body">Thank you for your follow-up.<br>Our team will review it shortly.</div>
+                            </div>
+                        </div>
+                    `,
+                    duration: 6000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    stopOnFocus: true,
+                    escapeMarkup: false,
+                    offset: { x: 30, y: 100 },
+                    style: {
+                        background: "#28a745",
+                        color: "white",
+                        borderRadius: "10px",
+                        boxShadow: "0 5px 20px rgba(0,0,0,0.2)",
+                        fontFamily: "'Segoe UI', sans-serif",
+                        fontSize: "16px",
+                        padding: "16px 24px",
+                        maxWidth: "420px"
+                    },
+                    onClick: function () {
+                        window.location.href = "{{ url_for('home') }}";
+                    }
+                }).showToast();
+
+                window.history.replaceState({}, document.title, "{{ url_for('follow_up') }}");
+            }
+        });
+
+        // ── Expandable Description Modal ─────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', function () {
+            const descModal = document.getElementById('descModal');
+            const modalDescContent = document.getElementById('modalDescContent');
+            const modalTitle = document.getElementById('descModalLabel');
+
+            document.querySelectorAll('.btn-view-desc').forEach(button => {
+                button.addEventListener('click', function () {
+                    const description = this.getAttribute('data-description');
+                    modalDescContent.textContent = description || 'No description available.';
+                    modalTitle.textContent = 'Request Description';
+                });
+            });
+        });
+    </script>
+    <script>
+        // OTP auto-advance + paste + auto-submit
+        const otpInputs = document.querySelectorAll('.otp-input');
+        const hiddenOtp = document.getElementById('otpCombined');
+        const otpForm = document.getElementById('otpForm');
+        const submitBtn = document.getElementById('submitBtn');
+        
+        function updateCombinedValue() {
+            const code = Array.from(otpInputs).map(inp => inp.value).join('');
+            hiddenOtp.value = code;
+            
+            if (code.length === 6) {
+                submitBtn.disabled = false;
+                // Optional: auto-submit (uncomment if desired)
+                // otpForm.submit();
+            } else {
+                submitBtn.disabled = true;
+            }
+        }
+        
+        otpInputs.forEach((input, idx) => {
+            input.addEventListener('input', (e) => {
+                if (e.target.value.length === 1 && idx < 5) {
+                    otpInputs[idx + 1].focus();
+                }
+                updateCombinedValue();
+            });
+        
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && e.target.value === '' && idx > 0) {
+                    otpInputs[idx - 1].focus();
+                }
+            });
+        
+            input.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const pasted = (e.clipboardData || window.clipboardData)
+                    .getData('text')
+                    .replace(/\D/g, '')
+                    .slice(0, 6);
+        
+                if (pasted.length > 0) {
+                    pasted.split('').forEach((digit, i) => {
+                        if (idx + i < 6) {
+                            otpInputs[idx + i].value = digit;
+                        }
+                    });
+                    updateCombinedValue();
+                    // Focus last filled or last box
+                    const nextEmpty = Array.from(otpInputs).slice(idx + pasted.length).find(el => !el.value);
+                    (nextEmpty || otpInputs[5]).focus();
+                }
+            });
+        });
+        
+        // Timer (10 minutes = 600 seconds)
+        let timeLeft = 600;
+        const timeDisplay = document.getElementById('timeDisplay');
+        const timerEl = document.getElementById('timer');
+        
+        function startTimer() {
+            const timer = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    timeDisplay.textContent = "00:00";
+                    timerEl.classList.add('expired');
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = "Code Expired";
+                    return;
+                }
+        
+                const min = Math.floor(timeLeft / 60);
+                const sec = timeLeft % 60;
+                timeDisplay.textContent = `${min}:${sec.toString().padStart(2, '0')}`;
+                timeLeft--;
+            }, 1000);
+        }
+        
+        if (document.getElementById('step-verify') && !document.getElementById('step-verify').classList.contains('hidden')) {
+            startTimer();
+        }
+        
+        // Resend countdown remains the same (30 seconds)
+        </script>
+        <script>
+            // Cleanup when leaving the message step (close tab, refresh, navigate away)
+            function cleanupFollowUpSession() {
+                navigator.sendBeacon(
+                    '{{ url_for("followup_session_cleanup") }}',
+                    new Blob([], { type: 'text/plain' })
+                );
+            }
+            
+            // Run cleanup when:
+            // A. Page is about to be unloaded (close tab, refresh, back button)
+            window.addEventListener('beforeunload', () => {
+                if (document.getElementById('step-message') && 
+                    !document.getElementById('step-message').classList.contains('hidden')) {
+                    cleanupFollowUpSession();
+                }
+            });
+            
+            // B. User clicks any link while in message step (except # anchors)
+            document.querySelectorAll('a:not([href^="#"])').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (document.getElementById('step-message') && 
+                        !document.getElementById('step-message').classList.contains('hidden')) {
+                        cleanupFollowUpSession();
+                    }
+                });
+            });
+            </script>
+</body>
+</html>

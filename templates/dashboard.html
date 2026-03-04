@@ -3,54 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rago Admin Dashboard</title>
+    <title>RAGO Admin Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
-        body { background: #f1f5f9; font-family: system-ui, sans-serif; min-height: 100vh; }
-        .sidebar { 
-            background: #0f172a; color: white; height: 100vh; position: fixed; width: 260px; 
-            padding-top: 1rem; overflow-y: auto; z-index: 1000;
+        body {
+            background: #f1f5f9;
+            font-family: system-ui, sans-serif;
+            min-height: 100vh;
+            padding-top: 90px; /* adjusted for header height */
         }
-        .sidebar a { 
-            color: rgba(255,255,255,0.8); display: block; padding: 0.75rem 1.5rem; 
-            text-decoration: none; transition: all 0.2s;
+
+        .dashboard-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1080;                    /* ← Increased – must be above sidebar */
+            background: linear-gradient(135deg, #001f3f 0%, #0f172a 100%);
+            color: white;
+            padding: 0.75rem 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
         }
-        .sidebar a:hover { background: #1e293b; color: white; }
-        .main-content { margin-left: 260px; padding: 2rem; }
+
+        .dashboard-header .container-fluid {
+            max-width: 1400px;
+        }
+
+        /* Left Sidebar – Navigation */
+        .sidebar {
+            background: #0f172a;
+            color: white;
+            height: 100vh;
+            position: fixed !important;
+            width: 260px !important;                /* Force 240px */
+            max-width: 260px !important;
+            min-width: 260px !important;             /* ← Reduced from 280px */
+            top: 0;
+            left: 0;
+            z-index: 1020;
+            overflow-y: auto;
+            overflow-x: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        /* Main content should shift left by the same amount */
+        .main-content {
+            margin-left: 240px;         /* ← Match sidebar width */
+            padding: 1rem 2rem;
+            padding-top: 1.5rem;
+        }
+
+        .sidebar .offcanvas-body {
+            padding-top: 80px;
+            padding-bottom: 2rem;
+        }
+
+        .sidebar a {
+            color: rgba(255,255,255,0.9);
+            display: block;
+            padding: 0.75rem 1.25rem;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .sidebar a:hover, .sidebar a.active {
+            background: #1e293b;
+            color: white;
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 991.98px) {
+            body { padding-top: 75px; }
+            .dashboard-header { padding: 0.6rem 1rem; }
+            .sidebar {
+                transform: translateX(-100%);
+                width: 300px;
+            }
+            .sidebar.show { transform: translateX(0); }
+            .main-content {
+                margin-left: 0 !important;
+                padding: 1rem;
+            }
+            .sidebar .offcanvas-body {
+                padding-top: 70px;
+            }
+            .user-avatar {
+                width: 42px;
+                height: 42px;
+            }
+            .notification-bell {
+                font-size: 1.3rem;
+                padding: 0.4rem 0.8rem;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .sidebar {
+                transform: none !important;
+                display: block !important;
+                left: 0 !important;           /* Force visible on desktop */
+                visibility: visible !important;
+            }
+            .hamburger-toggler { display: none !important; }
+        }
+
+        /* Right Notifications Offcanvas */
+        #notificationOffcanvas {
+            width: 360px !important;
+            background: #0f172a;
+            color: #e2e8f0;
+            border-left: 1px solid #334155;
+        }
+
+        #notificationOffcanvas .offcanvas-header {
+            border-bottom: 1px solid #334155;
+            background: #1e293b;
+        }
+
+        #notificationOffcanvas .offcanvas-body {
+            color: #e2e8f0;
+        }
+
+        #notificationOffcanvas .text-secondary,
+        #notificationOffcanvas small.text-secondary {
+            color: #94a3b8 !important;
+        }
+
+        #notificationOffcanvas .text-muted,
+        #notificationOffcanvas small.text-muted {
+            color: #94a3b8 !important;
+        }
+
+        #notificationOffcanvas a.list-group-item-action {
+            color: #cbd5e1;
+            background: transparent;
+        }
+
+        #notificationOffcanvas a.list-group-item-action:hover {
+            background: #1e293b;
+            color: white;
+        }
+
+        .notification-bell {
+            font-size: 1.4rem;
+            position: relative;
+            cursor: pointer;
+            color: white;
+            padding: 0.5rem 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .notification-bell:hover {
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 6px;
+            right: 4px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            min-width: 18px;
+            height: 18px;
+            font-size: 0.68rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+        }
+
         .card { border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        .status-badge { font-size: 0.6rem; padding: 0.5em 1em; }
-        .btn-sm { font-size: 0.85rem; padding: 0.2rem 0.4rem; }
-        .dropdown-menu { min-width: 280px; max-height: 420px; overflow-y: auto; }
+        .status-badge { font-size: 0.7rem; padding: 0.4em 0.8em; }
+        .btn-sm { font-size: 0.85rem; padding: 0.25rem 0.5rem; }
         .action-btn { width: 80px; }
         .attachment-btn { white-space: nowrap; }
-        .filter-section { margin-bottom: 1.5rem; max-width: 300px; }
-        .notification-bell { 
-            font-size: 1.4rem; position: relative; cursor: pointer; padding: 0.75rem 1rem; 
-            display: flex; align-items: center; transition: all 0.2s;
-        }
-        .notification-bell:hover { background: #1e293b; }
-        .notification-badge { 
-            position: absolute; top: 8px; right: 8px; background: #dc3545; color: white; 
-            border-radius: 50%; min-width: 20px; height: 20px; font-size: 0.7rem; font-weight: bold; 
-            display: flex; align-items: center; justify-content: center; padding: 0 6px;
-        }
-        .notification-bell .badge:empty { display: none; }
-        #loading-overlay { 
-            position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; 
+        .filter-section { margin-bottom: 1.5rem; }
+        #loading-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none;
             justify-content: center; align-items: center; z-index: 9999;
         }
         #loading-overlay.show { display: flex; }
-        .spinner-wrapper { 
-            background: white; padding: 2.5rem 3.5rem; border-radius: 16px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.25); text-align: center;
+        .user-avatar {
+            width: 50px; height: 50px; border-radius: 50%; object-fit: cover;
+            border: 3px solid rgba(255,255,255,0.4); cursor: pointer;
         }
-        @media (max-width: 992px) { 
-            .sidebar { width: 100%; height: auto; position: relative; } 
-            .main-content { margin-left: 0; } 
-        }
+        .user-avatar:hover { transform: scale(1.08); }
+
+        /* Ensure offcanvas is clickable */
+        .offcanvas { z-index: 1055 !important; }
+        .offcanvas-backdrop { z-index: 1050 !important; }
     </style>
 </head>
 <body>
@@ -65,46 +212,147 @@
         </div>
     </div>
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="text-center py-4">
-            <h4>Rago Admin</h4>
-        </div>
+    <!-- Fixed Dashboard Header -->
+    <header class="dashboard-header">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center">
+                <!-- Left: Hamburger (mobile) + Brand / User info -->
+                <div class="d-flex align-items-center gap-3">
+                    <button class="hamburger-toggler d-lg-none btn btn-link p-0" type="button" 
+                            data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas">
+                        <i class="fas fa-bars fa-lg"></i>
+                    </button>
+                    <div>
+                        <h2 class="mb-0 fw-bold fs-5">Rago Global Solutions</h2>
+                        <div class="d-flex align-items-center gap-2 small">
+                            <strong class="d-none d-md-block">
+                                {{ current_user.full_name or current_user.username }}
+                            </strong>
+                            <span class="badge bg-light text-dark d-none d-md-block">
+                                {{ current_user.role | replace('_', ' ') | title }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="dropdown">
-            <div class="notification-bell dropdown-toggle" id="notificationBell" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fas fa-bell me-2"></i> Notifications
-                <span class="notification-badge" id="pendingCount">0</span>
-            </div>
-            <div class="dropdown-menu dropdown-menu-end shadow-lg p-0" id="notificationDropdown" style="width: 360px;">
-                <div class="p-3 bg-light border-bottom text-center fw-bold">Pending Requests</div>
-                <div id="pendingList" class="list-group list-group-flush"></div>
-                <div class="p-3 text-center text-muted small" id="noPending" style="display: none;">
-                    No pending requests at the moment
+                <!-- Right: Notification Bell + Profile Avatar -->
+                <div class="d-flex align-items-center gap-3 gap-md-4">
+                    <div class="notification-bell" data-bs-toggle="offcanvas" data-bs-target="#notificationOffcanvas">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="totalNotificationCount">0</span>
+                    </div>
+
+                    <div data-bs-toggle="modal" data-bs-target="#uploadAvatarModal" style="cursor: pointer;">
+                        {% if current_user.profile_picture %}
+                            <img src="{{ url_for('static', filename='uploads/' + current_user.profile_picture) }}" 
+                                 alt="Profile" class="user-avatar">
+                        {% else %}
+                            <div class="user-avatar d-flex align-items-center justify-content-center bg-light text-primary">
+                                <i class="fas fa-user fa-lg"></i>
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
+    </header>
 
-        <a href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a>
-        {% if current_user.role == 'admin' %}
-        <a href="{{ url_for('manage_users') }}"><i class="fas fa-users me-2"></i> Users</a>
-        {% endif %}
-        <a href="#"><i class="fas fa-cog me-2"></i> Settings</a>
-        <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
+    <!-- Left Sidebar – Navigation -->
+    <div class="sidebar offcanvas offcanvas-start" tabindex="-1" id="sidebarOffcanvas" aria-labelledby="sidebarOffcanvasLabel">
+        <div class="offcanvas-header d-lg-none">
+            <h5 class="offcanvas-title fw-bold" id="sidebarOffcanvasLabel">RAGO Service Desk</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body px-0">
+            <div class="px-3 py-4">
+                <a href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a>
+                {% if current_user.role in ['admin', 'superadmin'] %}
+                <a href="{{ url_for('manage_users') }}"><i class="fas fa-users me-2"></i> Users</a>
+                {% endif %}
+                <a href="#"><i class="fas fa-cog me-2"></i> Settings</a>
+
+                <hr class="border-secondary my-4">
+
+                <a href="{{ url_for('change_password') }}" class="d-block px-3 py-2 mt-2 change-password-btn">
+                    <i class="fas fa-key me-2"></i> Change Password
+                </a>
+
+                <a href="https://ragoglobal.pythonanywhere.com" target="_blank" class="d-block px-3 py-2 mt-2 home-btn">
+                    <i class="fas fa-home me-2"></i> Back to Homepage
+                </a>
+
+                <a href="{{ url_for('logout') }}" class="d-block px-3 py-2 mt-3 text-danger">
+                    <i class="fas fa-sign-out-alt me-2"></i> Logout
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Notifications Offcanvas -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="notificationOffcanvas" aria-labelledby="notificationOffcanvasLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title fw-bold" id="notificationOffcanvasLabel">
+                <i class="fas fa-bell me-2"></i> Notifications
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body px-3">
+            <div class="p-3 bg-dark border-bottom text-center fw-bold text-white mb-3">Pending & Follow-up</div>
+
+            <div class="mb-4">
+                <small class="d-block text-center mb-3 fw-semibold text-info">Pending Requests</small>
+                <div id="pendingList" class="list-group list-group-flush"></div>
+            </div>
+
+            <div class="border-top border-secondary pt-4">
+                <small class="d-block text-center mb-3 fw-semibold text-info">New Follow-ups</small>
+                <div id="followupList" class="list-group list-group-flush"></div>
+            </div>
+
+            <div id="noNotifications" class="p-5 text-center text-muted small" style="display: none;">
+                No pending or follow-up requests
+            </div>
+        </div>
     </div>
 
     <!-- Main Content -->
     <div class="main-content">
         <h1 class="mb-4 fw-bold">POC & Demo Requests</h1>
 
-        <div class="filter-section">
-            <label for="typeFilter" class="form-label fw-bold">Filter by Request Type</label>
-            <select id="typeFilter" class="form-select">
-                <option value="all" selected>All Types</option>
-                <option value="Enquiry">Enquiry</option>
-                <option value="POC">POC</option>
-                <option value="Demo">Demo</option>
-            </select>
+        <div class="filter-section mb-4">
+            <form id="filterForm" method="GET" class="row g-3 align-items-end">
+                <div class="col-md-3 col-sm-6">
+                    <label for="refSearch" class="form-label fw-bold">Search by Ticket ID</label>
+                    <input type="text" name="search" id="refSearch" class="form-control" 
+                           placeholder="e.g. REF-0012345678" value="{{ current_search }}">
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <label for="typeFilter" class="form-label fw-bold">Filter by Type</label>
+                    <select name="type" id="typeFilter" class="form-select">
+                        <option value="all" {% if current_type == 'all' or not current_type %}selected{% endif %}>All Types</option>
+                        <option value="Enquiry" {% if current_type == 'Enquiry' %}selected{% endif %}>Enquiry</option>
+                        <option value="POC" {% if current_type == 'POC' %}selected{% endif %}>POC</option>
+                        <option value="Demo" {% if current_type == 'Demo' %}selected{% endif %}>Demo</option>
+                        <option value="Follow-up" {% if current_type == 'Follow-up' %}selected{% endif %}>Follow-up</option>
+                    </select>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <label for="statusFilter" class="form-label fw-bold">Filter by Status</label>
+                    <select name="status" id="statusFilter" class="form-select">
+                        <option value="all" {% if current_status == 'all' or not current_status %}selected{% endif %}>All Statuses</option>
+                        <option value="Pending" {% if current_status == 'Pending' %}selected{% endif %}>Pending</option>
+                        <option value="Acknowledged" {% if current_status == 'Acknowledged' %}selected{% endif %}>Acknowledged</option>
+                        <option value="Declined" {% if current_status == 'Declined' %}selected{% endif %}>Declined</option>
+                        <option value="Completed" {% if current_status == 'Completed' %}selected{% endif %}>Completed</option>
+                        <option value="Follow-up" {% if current_status == 'Follow-up' %}selected{% endif %}>Follow-up</option>
+                        <option value="Scheduled" {% if current_status == 'Scheduled' %}selected{% endif %}>Scheduled</option>
+                        <option value="Reviewed" {% if current_status == 'Reviewed' %}selected{% endif %}>Reviewed</option>
+                    </select>
+                </div>
+                <div class="col-md-3 col-sm-6 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                </div>
+            </form>
         </div>
 
         <div class="card">
@@ -113,6 +361,7 @@
                     <table class="table table-hover mb-0 align-middle" id="requestsTable">
                         <thead class="table-dark">
                             <tr>
+                                <th>Ticket ID</th>
                                 <th>Organization</th>
                                 <th>Type</th>
                                 <th>Contact Person</th>
@@ -122,7 +371,7 @@
                                 <th>Status</th>
                                 <th>Created</th>
                                 <th>Attachment</th>
-                                {% if current_user.role == 'admin' %}
+                                {% if current_user.role in ['superadmin', 'admin', 'team'] %}
                                 <th>Actions</th>
                                 {% endif %}
                             </tr>
@@ -130,7 +379,8 @@
                         <tbody>
                             {% if requests %}
                                 {% for req in requests %}
-                                <tr data-request-type="{{ req.request_type }}">
+                                <tr>
+                                    <td><strong>{{ req.reference_id }}</strong></td>
                                     <td>{{ req.organization }}</td>
                                     <td><span class="badge bg-info text-white">{{ req.request_type }}</span></td>
                                     <td>{{ req.contact_person }}</td>
@@ -144,21 +394,26 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <span class="badge status-badge bg-{{ 'warning' if req.status=='Pending' else 'success' if req.status in ['Approved','Scheduled','Completed'] else 'danger' if req.status=='Declined' else 'secondary' }}">
+                                        <span class="badge status-badge bg-{{
+                                            'warning' if req.status=='Pending' else 
+                                            'success' if req.status in ['Acknowledged','Scheduled','Completed'] else 
+                                            'danger' if req.status=='Declined' else 
+                                            'primary' if req.status=='Follow-up' else 
+                                            'secondary' }}">
                                             {{ req.status }}
                                         </span>
                                     </td>
                                     <td>{{ req.created_at.strftime('%d %b %Y %H:%M') }}</td>
                                     <td>
                                         {% if req.attachment %}
-                                            <a href="{{ get_signed_cloudinary_url(req.attachment, resource_type='raw') }}" target="_blank" class="btn btn-sm btn-outline-info attachment-btn">
-                                                <i class="fas fa-eye me-1"></i> View Attachment
+                                            <a href="{{ url_for('static', filename='uploads/' + req.attachment) }}" target="_blank" class="btn btn-sm btn-outline-info attachment-btn">
+                                                <i class="fas fa-eye me-1"></i> View
                                             </a>
                                         {% else %}
                                             <span class="text-muted">—</span>
                                         {% endif %}
                                     </td>
-                                    {% if current_user.role == 'admin' %}
+                                    {% if current_user.role in ['superadmin', 'admin', 'team'] %}
                                     <td>
                                         <div class="dropdown">
                                             <button class="btn btn-outline-primary btn-sm dropdown-toggle action-btn"
@@ -177,7 +432,7 @@
                                                         </a>
                                                     </li>
                                                     <li><hr class="dropdown-divider"></li>
-                                                {% elif req.status == 'Approved' %}
+                                                {% elif req.status == 'Acknowledged' %}
                                                     <li>
                                                         <a class="dropdown-item" href="{{ url_for('schedule_demo', id=req.id) }}">
                                                             <i class="fas fa-calendar-plus me-2 text-primary"></i> Schedule
@@ -188,9 +443,9 @@
                                                 {% if req.status == 'Pending' %}
                                                     <li>
                                                         <form action="{{ url_for('update_status', id=req.id) }}" method="POST" class="status-form">
-                                                            <input type="hidden" name="status" value="Approved">
-                                                            <button type="submit" class="dropdown-item text-success swal-approve">
-                                                                <i class="fas fa-check me-2"></i> Approve
+                                                            <input type="hidden" name="status" value="Acknowledged">
+                                                            <button type="submit" class="dropdown-item text-success swal-acknowledge">
+                                                                <i class="fas fa-check me-2"></i> Acknowledge
                                                             </button>
                                                         </form>
                                                     </li>
@@ -211,17 +466,18 @@
                                                             </button>
                                                         </form>
                                                     </li>
-                                                {% elif req.status == 'Scheduled' %}
+                                                {% endif %}
+                                                {% if req.status in ['Scheduled', 'Follow-up'] %}
                                                     <li>
                                                         <form action="{{ url_for('update_status', id=req.id) }}" method="POST" class="status-form">
                                                             <input type="hidden" name="status" value="Completed">
-                                                            <button type="submit" class="dropdown-item text-primary swal-complete">
+                                                            <button type="submit" class="dropdown-item text-success swal-complete">
                                                                 <i class="fas fa-check-double me-2"></i> Mark Completed
                                                             </button>
                                                         </form>
                                                     </li>
+                                                    <li><hr class="dropdown-divider"></li>
                                                 {% endif %}
-                                                <li><hr class="dropdown-divider"></li>
                                                 <li>
                                                     <a class="dropdown-item" href="{{ url_for('reply_client', id=req.id) }}">
                                                         <i class="fas fa-reply me-2 text-info"></i> Reply to Client
@@ -235,53 +491,111 @@
                                 {% endfor %}
                             {% else %}
                                 <tr>
-                                    <td colspan="{% if current_user.role == 'admin' %}10{% else %}9{% endif %}" class="text-center py-5 text-muted">
+                                    <td colspan="{% if current_user.role in ['superadmin', 'admin', 'team'] %}11{% else %}10{% endif %}" class="text-center py-5 text-muted">
                                         <i class="fas fa-inbox fs-1 d-block mb-3"></i>
-                                        No requests yet.
+                                        No requests found.
                                     </td>
                                 </tr>
                             {% endif %}
                         </tbody>
                     </table>
                 </div>
+
+                {% if total_requests > 0 %}
+                <div class="d-flex justify-content-between align-items-center p-3 bg-light border-top">
+                    <div class="pagination-info">
+                        Showing {{ (page - 1) * per_page + 1 }}–{{ end }} of {{ total_requests }} requests
+                    </div>
+                    <nav aria-label="Requests pagination">
+                        <ul class="pagination mb-0">
+                            <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                                <a class="page-link" href="?page={{ page - 1 }}&search={{ current_search }}&type={{ current_type }}&status={{ current_status }}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            {% for p in range(1, total_pages + 1) %}
+                            <li class="page-item {% if p == page %}active{% endif %}">
+                                <a class="page-link" href="?page={{ p }}&search={{ current_search }}&type={{ current_type }}&status={{ current_status }}">{{ p }}</a>
+                            </li>
+                            {% endfor %}
+                            <li class="page-item {% if page == total_pages %}disabled{% endif %}">
+                                <a class="page-link" href="?page={{ page + 1 }}&search={{ current_search }}&type={{ current_type }}&status={{ current_status }}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+                {% else %}
+                <div class="p-3 text-center text-muted">
+                    No requests to display.
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
+
+    <!-- Avatar Upload Modal -->
+    <div class="modal fade" id="uploadAvatarModal" tabindex="-1" aria-labelledby="uploadAvatarModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uploadAvatarModalLabel">Upload Profile Picture</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ url_for('upload_profile_picture') }}" method="POST" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="profile_picture" class="form-label">Choose Image (JPG/PNG, max 2MB)</label>
+                            <input type="file" class="form-control" id="profile_picture" name="profile_picture" 
+                                   accept="image/jpeg,image/png" required>
+                        </div>
+                        <small class="text-muted">Square images work best (recommended 200×200 px)</small>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio elements -->
+    <audio id="successChime" preload="auto">
+        <source src="{{ url_for('static', filename='success-chime.mp3') }}" type="audio/mpeg">
+    </audio>
+    <audio id="newNotificationSound" preload="auto">
+        <source src="{{ url_for('static', filename='notification-ping.mp3') }}" type="audio/mpeg">
+    </audio>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Success chime -->
-    <audio id="successChime" preload="auto">
-        <source src="static/success-chime.mp3" type="audio/mpeg">
-    </audio>
-
     <script>
         const successChime = document.getElementById('successChime');
-
-        // Toastify + Chime
+        const newNotificationSound = document.getElementById('newNotificationSound');
+        
+        // Try to persist count across page reloads (helps during dev/testing)
+        let previousNotificationCount = localStorage.getItem('lastNotificationCount') 
+            ? parseInt(localStorage.getItem('lastNotificationCount'), 10) 
+            : 0;
+    
+        // Flash messages + success sound
         const flashedMessages = {{ get_flashed_messages(with_categories=true) | tojson | safe }};
         if (flashedMessages && flashedMessages.length > 0) {
             flashedMessages.forEach(([category, message]) => {
-                let background = '#28a745';
-                let textColor = '#ffffff';
-
+                let bg = '#28a745', color = '#fff';
                 switch (category.toLowerCase()) {
-                    case 'success':
-                        background = '#28a745';
-                        textColor = '#ffffff';
-                        successChime.currentTime = 0;
-                        successChime.volume = 0.6;
-                        successChime.play().catch(e => console.warn("Chime blocked:", e));
-                        break;
-                    case 'danger': case 'error': background = '#dc3545'; break;
-                    case 'warning': background = '#ffc107'; textColor = '#212529'; break;
-                    case 'info': background = '#17a2b8'; break;
-                    default: background = '#6c757d';
+                    case 'success': bg = '#28a745'; break;
+                    case 'danger': bg = '#dc3545'; break;
+                    case 'warning': bg = '#ffc107'; color = '#212529'; break;
+                    case 'info': bg = '#17a2b8'; break;
+                    default: bg = '#6c757d';
                 }
-
                 Toastify({
                     text: message,
                     duration: 6000,
@@ -290,8 +604,8 @@
                     position: "right",
                     stopOnFocus: true,
                     style: {
-                        background: background,
-                        color: textColor,
+                        background: bg,
+                        color: color,
                         borderRadius: "10px",
                         boxShadow: "0 5px 20px rgba(0,0,0,0.2)",
                         fontFamily: "'Segoe UI', sans-serif",
@@ -301,33 +615,63 @@
                     },
                     offset: { x: 30, y: 100 }
                 }).showToast();
+    
+                if (category === 'success') {
+                    successChime.currentTime = 0;
+                    successChime.volume = 0.6;
+                    successChime.play().catch(() => {});
+                }
             });
         }
-
-        // Loading spinner
+    
+        // Loading overlay
         document.querySelectorAll('.status-form').forEach(form => {
             form.addEventListener('submit', () => {
                 document.getElementById('loading-overlay').classList.add('show');
             });
         });
-
+    
         window.addEventListener('pageshow', () => {
             document.getElementById('loading-overlay').classList.remove('show');
         });
-
-        // SweetAlert for complete (you can add more)
-        document.querySelectorAll('.swal-complete').forEach(btn => {
+    
+        // SweetAlert confirmations
+        document.querySelectorAll('.swal-acknowledge, .swal-decline, .swal-reopen, .swal-complete').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
                 const form = this.closest('form');
+                let title, text, icon, confirmColor;
+    
+                if (this.classList.contains('swal-acknowledge')) {
+                    title = 'Acknowledge Request?';
+                    text = "This will mark the request as acknowledged and notify the client.";
+                    icon = 'success';
+                    confirmColor = '#28a745';
+                } else if (this.classList.contains('swal-decline')) {
+                    title = 'Decline Request?';
+                    text = "This action cannot be easily undone. The client will be notified.";
+                    icon = 'warning';
+                    confirmColor = '#dc3545';
+                } else if (this.classList.contains('swal-reopen')) {
+                    title = 'Reopen Request?';
+                    text = "This will move the request back to Pending status.";
+                    icon = 'question';
+                    confirmColor = '#6c757d';
+                } else if (this.classList.contains('swal-complete')) {
+                    title = 'Mark as Completed?';
+                    text = "This will update the status to Completed and notify the client.";
+                    icon = 'info';
+                    confirmColor = '#28a745';
+                }
+    
                 Swal.fire({
-                    title: 'Mark as Completed?',
-                    text: "This will update the status to Completed.",
-                    icon: 'info',
+                    title: title,
+                    text: text,
+                    icon: icon,
                     showCancelButton: true,
-                    confirmButtonColor: '#28a745',
+                    confirmButtonColor: confirmColor,
                     cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Yes, Complete',
+                    confirmButtonText: 'Yes',
                     cancelButtonText: 'Cancel'
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -336,21 +680,92 @@
                 });
             });
         });
-
-        // Table filter
-        const typeFilter = document.getElementById('typeFilter');
-        const tableRows = document.querySelectorAll('#requestsTable tbody tr');
-
-        function applyFilter() {
-            const selectedType = typeFilter.value.toLowerCase();
-            tableRows.forEach(row => {
-                const rowType = row.getAttribute('data-request-type')?.toLowerCase();
-                row.style.display = (selectedType === 'all' || rowType === selectedType) ? '' : 'none';
-            });
+    
+        // Helper to improve sound reliability (handles autoplay policy)
+        function playSoundWithFallback(audio) {
+            audio.currentTime = 0;
+            audio.volume = 0.4;
+            const playPromise = audio.play();
+            
+            if (playPromise !== undefined) {
+                playPromise
+                    .then(() => {
+                        console.log("New notification sound played");
+                    })
+                    .catch(error => {
+                        console.warn("Autoplay was prevented:", error);
+                        // Browsers often block until user interacts — this is normal
+                    });
+            }
         }
-
-        typeFilter.addEventListener('change', applyFilter);
-        applyFilter();
+    
+        // Live notifications + new notification sound
+        function loadNotifications() {
+            fetch('{{ url_for("api_notifications") }}')
+                .then(r => r.json())
+                .then(data => {
+                    const total = (data.pending_count || 0) + (data.followup_count || 0);
+    
+                    // Debug log – helps see what’s happening
+                    console.log('Notifications fetched →', {
+                        pending: data.pending_count,
+                        followup: data.followup_count,
+                        total_now: total,
+                        previous: previousNotificationCount,
+                        increased: total > previousNotificationCount,
+                        willPlay: total > previousNotificationCount && total > 0
+                    });
+    
+                    // Play sound when count increases (new pending or new follow-up)
+                    if (total > previousNotificationCount && total > 0) {
+                        playSoundWithFallback(newNotificationSound);
+                    }
+    
+                    // Update stored count
+                    previousNotificationCount = total;
+                    localStorage.setItem('lastNotificationCount', total);
+    
+                    // Update badge
+                    document.getElementById('totalNotificationCount').textContent = total || '';
+    
+                    // Pending list
+                    const pendingList = document.getElementById('pendingList');
+                    pendingList.innerHTML = '';
+                    if (data.pending_requests?.length) {
+                        data.pending_requests.forEach(r => {
+                            pendingList.innerHTML += `
+                                <a href="#request-${r.id}" class="list-group-item list-group-item-action">
+                                    <strong>${r.reference_id}</strong><br>
+                                    <small>${r.organization} • ${r.request_type}</small>
+                                </a>`;
+                        });
+                    }
+    
+                    // Follow-up list
+                    const followupList = document.getElementById('followupList');
+                    followupList.innerHTML = '';
+                    if (data.followup_requests?.length) {
+                        data.followup_requests.forEach(f => {
+                            followupList.innerHTML += `
+                                <a href="#request-${f.id}" class="list-group-item list-group-item-action text-primary">
+                                    <strong>New Follow-up</strong><br>
+                                    <small>Ticket: ${f.reference_id} • ${f.organization}</small>
+                                </a>`;
+                        });
+                    }
+    
+                    // No notifications message
+                    document.getElementById('noNotifications').style.display = 
+                        (total === 0) ? 'block' : 'none';
+                })
+                .catch(err => console.error('Notification fetch failed:', err));
+        }
+    
+        // Load immediately + poll every 30 seconds
+        window.addEventListener('load', () => {
+            loadNotifications();
+            setInterval(loadNotifications, 30000);
+        });
     </script>
 </body>
 </html>

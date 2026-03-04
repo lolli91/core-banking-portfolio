@@ -17,9 +17,36 @@
             color: rgba(255,255,255,0.8); display: block; padding: 0.75rem 1.5rem; 
             text-decoration: none; transition: all 0.2s;
         }
-        .sidebar a:hover { background: #1e293b; color: white; }
+        .sidebar a:hover, .sidebar a.active { background: #1e293b; color: white; }
         .main-content { margin-left: 260px; padding: 2rem; }
         .card { border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .form-label { font-weight: 600; }
+        .input-group-lg .form-control { font-size: 1.1rem; }
+        .user-header {
+            background: linear-gradient(135deg, #001f3f, #0f172a);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px 12px 0 0;
+            text-align: center;
+        }
+        .role-badge {
+            font-size: 0.9rem;
+            padding: 0.5em 1.2em;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .restricted-notice {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        .read-only-field {
+            background-color: #f8f9fa !important;
+            color: #495057;
+            cursor: not-allowed;
+        }
         @media (max-width: 992px) { 
             .sidebar { width: 100%; height: auto; position: relative; } 
             .main-content { margin-left: 0; } 
@@ -34,7 +61,7 @@
             <h4>Rago Admin</h4>
         </div>
         <a href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a>
-        <a href="{{ url_for('manage_users') }}"><i class="fas fa-users me-2"></i> Users</a>
+        <a href="{{ url_for('manage_users') }}" class="active"><i class="fas fa-users me-2"></i> Users</a>
         <a href="#"><i class="fas fa-cog me-2"></i> Settings</a>
         <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
     </div>
@@ -44,52 +71,128 @@
         <h1 class="mb-4 fw-bold">{{ title }}</h1>
 
         <div class="card shadow-sm">
-            <div class="card-body">
+            <div class="user-header">
+                <h3 class="mb-2">{{ title }}</h3>
+                <span class="role-badge rounded-pill">
+                    <i class="fas fa-user-shield me-1"></i>
+                    {{ form.role.data | capitalize }} 
+                    {% if user and user.username == 'admin' %}
+                        <span class="badge bg-warning ms-2">Protected</span>
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="card-body p-4">
+                {% if is_admin %}
+                    <div class="restricted-notice">
+                        <strong><i class="fas fa-info-circle me-1"></i> Limited Edit Mode (Admin)</strong><br>
+                        You can change role (via dropdown) and reset password.
+                    </div>
+                {% endif %}
+
                 <form method="POST">
                     {{ form.hidden_tag() }}
 
+                    <!-- Username -->
                     <div class="mb-4">
                         {{ form.username.label(class="form-label fw-bold") }}
-                        {{ form.username(class="form-control form-control-lg") }}
-                        {% for error in form.username.errors %}
-                            <div class="text-danger small mt-1">{{ error }}</div>
-                        {% endfor %}
+                        {% if is_admin %}
+                            <input type="text" class="form-control read-only-field" 
+                                   value="{{ form.username.data }}" readonly>
+                            <!-- Hidden to preserve value on submit -->
+                            <input type="hidden" name="username" value="{{ form.username.data }}">
+                        {% else %}
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text"><i class="fas fa-at"></i></span>
+                                {{ form.username(class="form-control") }}
+                            </div>
+                            {% for error in form.username.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
                     </div>
 
+                    <!-- Full Name -->
+                    <div class="mb-4">
+                        {{ form.full_name.label(class="form-label fw-bold") }}
+                        {% if is_admin %}
+                            <input type="text" class="form-control read-only-field" 
+                                   value="{{ form.full_name.data or '' }}" readonly>
+                            <input type="hidden" name="full_name" value="{{ form.full_name.data or '' }}">
+                        {% else %}
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                {{ form.full_name(class="form-control") }}
+                            </div>
+                            {% for error in form.full_name.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Email -->
                     <div class="mb-4">
                         {{ form.email.label(class="form-label fw-bold") }}
-                        {{ form.email(class="form-control form-control-lg") }}
-                        {% for error in form.email.errors %}
-                            <div class="text-danger small mt-1">{{ error }}</div>
-                        {% endfor %}
+                        {% if is_admin %}
+                            <input type="email" class="form-control read-only-field" 
+                                   value="{{ form.email.data }}" readonly>
+                            <input type="hidden" name="email" value="{{ form.email.data }}">
+                        {% else %}
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                {{ form.email(class="form-control") }}
+                            </div>
+                            {% for error in form.email.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
                     </div>
 
+                    <!-- Role: always dropdown for selection -->
                     <div class="mb-4">
                         {{ form.role.label(class="form-label fw-bold") }}
                         <select name="role" class="form-select form-select-lg" required>
-                            <option value="admin" {% if form.role.data == 'admin' %}selected{% endif %}>Admin (Full Access)</option>
-                            <option value="viewer" {% if form.role.data == 'viewer' %}selected{% endif %}>Viewer (Read-Only)</option>
+                            <option value="superadmin" {% if form.role.data == 'superadmin' %}selected{% endif %}>
+                                Super Admin (Full System Control)
+                            </option>
+                            <option value="admin" {% if form.role.data == 'admin' %}selected{% endif %}>
+                                Admin (Manage Users & Content)
+                            </option>
+                            <option value="team" {% if form.role.data == 'team' %}selected{% endif %}>
+                                Team Member (Task Execution)
+                            </option>
+                            <option value="viewer" {% if form.role.data == 'viewer' %}selected{% endif %}>
+                                Viewer (Read-Only Access)
+                            </option>
                         </select>
-                    </div>
-
-                    <div class="mb-4">
-                        {{ form.password.label(class="form-label fw-bold") }}
-                        {{ form.password(class="form-control form-control-lg") }}
-                        <small class="text-muted">
-                            {% if 'Edit' in title %}
-                                Leave blank to keep current password
+                        <small class="text-muted mt-1">
+                            {% if is_admin %}
+                                Select new role
                             {% else %}
-                                Minimum 8 characters
+                                Full role selection
                             {% endif %}
                         </small>
+                    </div>
+
+                    <!-- Password Reset -->
+                    <div class="mb-4">
+                        {{ form.password.label(class="form-label fw-bold") }}
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            {{ form.password(class="form-control") }}
+                        </div>
+                        <small class="text-muted">Leave blank to keep current password</small>
                         {% for error in form.password.errors %}
                             <div class="text-danger small mt-1">{{ error }}</div>
                         {% endfor %}
                     </div>
 
+                    <!-- Submit -->
                     <div class="text-end mt-5">
                         {{ form.submit(class="btn btn-primary btn-lg px-5 py-3") }}
-                        <a href="{{ url_for('manage_users') }}" class="btn btn-outline-secondary btn-lg px-5 py-3 ms-3">Cancel</a>
+                        <a href="{{ url_for('manage_users') }}" class="btn btn-outline-secondary btn-lg px-5 py-3 ms-3">
+                            Cancel
+                        </a>
                     </div>
                 </form>
             </div>

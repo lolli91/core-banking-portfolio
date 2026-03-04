@@ -39,3 +39,6 @@ psycopg2-binary>=2.9.9
 gunicorn==22.0.0
 cloudinary
 requests>=2.31.0
+Flask-Session
+flask-recaptcha
+markup
