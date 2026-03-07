@@ -234,8 +234,7 @@
                 <div class="step-section {% if step != 'verify' %}hidden{% endif %}" id="step-verify">
                     <h5 class="form-section-title">Step 2: Enter Verification Code</h5>
                     <p class="text-muted mb-4 text-center">
-                        We sent a 6-digit code to<br>
-                        <strong>{{ followup_email or session.followup_email or 'your email' }}</strong>
+                        We have sent a 6-digit code to your email<strong>{{ followup_email or session.followup_email or 'your email' }}</strong>
                     </p>
 
                     <form method="POST" novalidate id="otpForm">

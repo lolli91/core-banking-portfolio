@@ -169,9 +169,9 @@ class POCRequestForm(FlaskForm):
 
 
 class AdminLoginForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
+    username = StringField('Username or Email', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
-    remember = BooleanField('Remember Me')   # ← NEW
+    remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
 
 
@@ -231,7 +231,7 @@ class PublicDemoForm(FlaskForm):
     description = TextAreaField('Additional Details / Questions', validators=[DataRequired()])
     attachment = FileField(
         'Supporting Document (for POC only)',
-        validators=[FileAllowed(['pdf', 'doc', 'docx', 'zip'], 'Only PDF, Word, or ZIP allowed')]
+        validators=[FileAllowed(['pdf', 'doc', 'xlsx', 'xls', 'docx', 'zip'], 'Only PDF, Word, Excel or ZIP allowed')]
     )
     submit = SubmitField('Submit Request')
 
@@ -247,9 +247,30 @@ class ReplyClientForm(FlaskForm):
     message = TextAreaField('Message', validators=[DataRequired(), Length(min=2, max=5000)])
     attachment = FileField(
         'Attach File (optional)',
-        validators=[FileAllowed(['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'zip'], 'Allowed formats: PDF, Word, Images, ZIP')]
+        validators=[FileAllowed(['pdf', 'doc', 'docx', 'xlsx', 'xls', 'jpg', 'jpeg', 'png', 'zip'], 
+                                'Allowed formats: PDF, Word, Excel, Images, ZIP')]
     )
+    cc_email = StringField('CC (optional – comma separated)', 
+                           validators=[Optional()])
     submit = SubmitField('Send Reply')
+
+class ClientReply(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    request_id = db.Column(db.Integer, db.ForeignKey('poc_request.id'), nullable=False)
+    subject = db.Column(db.String(200), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    attachment = db.Column(db.String(255), nullable=True)
+    sent_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    sent_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    
+    # New field for CC logging
+    cc_recipients = db.Column(db.String(500), nullable=True)  # comma-separated emails
+
+    request = db.relationship('POCRequest', backref=db.backref('replies', lazy=True, cascade="all, delete-orphan"))
+    sent_by = db.relationship('User', backref=db.backref('sent_replies', lazy=True))
+
+    def __repr__(self):
+        return f"<Reply {self.id} to {self.request.reference_id}>"
 
 class CreateUserForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=3, max=80)])
@@ -303,7 +324,7 @@ class FollowUpMessageForm(FlaskForm):
     message = TextAreaField('Your Message / Question', 
                            validators=[DataRequired(), Length(min=2, max=5000)])
     attachment = FileField('Attach File (optional)', 
-                          validators=[FileAllowed(['pdf','doc','docx','jpg','jpeg','png','zip'])])
+                          validators=[FileAllowed(['pdf','doc','docx','xlsx','xls','jpg','jpeg','png','zip'])])
     submit_message = SubmitField('Send Follow-up Message')
         
 # =========================
@@ -369,8 +390,7 @@ def save_unique_attachment(file, organization):
 # =========================
 # EMAIL UTILITIES
 # =========================
-# Updated EMAIL UTILITIES - uses local path directly
-def send_email(to_email, subject, plain_body, html_body=None, attachment_path=None, extra_attachment=None):
+def send_email(to_email, subject, plain_body, html_body=None, attachment_path=None, extra_attachment=None, cc=None):
     if not app.config.get('MAIL_USERNAME') or not app.config.get('MAIL_PASSWORD'):
         print("Email credentials not configured.")
         return
@@ -380,12 +400,16 @@ def send_email(to_email, subject, plain_body, html_body=None, attachment_path=No
         msg['From'] = app.config['MAIL_USERNAME']
         msg['To'] = to_email
         msg['Subject'] = subject
+        
+        # Add CC if provided
+        if cc and isinstance(cc, list) and cc:
+            msg['Cc'] = ", ".join(cc)
 
         msg.attach(MIMEText(plain_body, 'plain'))
         if html_body:
             msg.attach(MIMEText(html_body, 'html'))
 
-        # Main attachment (e.g. ICS)
+        # Main attachment
         if attachment_path and os.path.exists(attachment_path):
             part = MIMEBase('application', "octet-stream")
             with open(attachment_path, 'rb') as f:
@@ -394,7 +418,7 @@ def send_email(to_email, subject, plain_body, html_body=None, attachment_path=No
             part.add_header('Content-Disposition', f'attachment; filename="{os.path.basename(attachment_path)}"')
             msg.attach(part)
 
-        # Extra attachment (client uploaded file)
+        # Extra attachment (if any)
         if extra_attachment and os.path.exists(extra_attachment):
             part2 = MIMEBase('application', "octet-stream")
             with open(extra_attachment, 'rb') as f:
@@ -407,9 +431,15 @@ def send_email(to_email, subject, plain_body, html_body=None, attachment_path=No
         if app.config['MAIL_USE_TLS']:
             server.starttls()
         server.login(app.config['MAIL_USERNAME'], app.config['MAIL_PASSWORD'])
-        server.sendmail(app.config['MAIL_USERNAME'], to_email, msg.as_string())
+        server.sendmail(
+            app.config['MAIL_USERNAME'], 
+            [to_email] + (cc or []),  # send to To + CC recipients
+            msg.as_string()
+        )
         server.quit()
         print(f"[EMAIL SENT] to {to_email} - Subject: {subject}")
+        if cc:
+            print(f"  CC: {', '.join(cc)}")
     except Exception as e:
         print("Email Error:", str(e))
 
@@ -489,10 +519,9 @@ def reply_client(id):
     form = ReplyClientForm()
 
     if form.validate_on_submit():
-        # Prepare reply subject with reference ID
         reply_subject = f"Re: {form.subject.data}"
 
-        # Build professional HTML email body
+        # Build HTML email body (unchanged)
         html_body = f"""
         <!DOCTYPE html>
         <html>
@@ -518,14 +547,11 @@ def reply_client(id):
                 <div class="content">
                     <p>Dear <strong>{req.contact_person}</strong>,</p>
                     <p style="white-space: pre-wrap;">{form.message.data}</p>
-
                     <p style="margin-top: 30px; text-align: center;">
                         <a href="https://ragoglobal.pythonanywhere.com" class="btn">Visit Our Website</a>
                     </p>
-
                     <p>Reference ID for this conversation: <strong class="highlight">{req.reference_id}</strong><br>
                     Please include this reference in any future replies for faster assistance.</p>
-
                     <p>Best regards,<br>
                     <strong>Rago Global Solutions Team</strong><br>
                     <a href="mailto:helpdesk.ragosa.tech@gmail.com">helpdesk.ragosa.tech@gmail.com</a><br>
@@ -533,14 +559,12 @@ def reply_client(id):
                 </div>
                 <div class="footer">
                     © 2026 Rago Global Solutions Ltd. All rights reserved.<br>
-                    
                 </div>
             </div>
         </body>
         </html>
         """
 
-        # Plain text fallback
         plain_body = f"""Dear {req.contact_person},
 
 {form.message.data}
@@ -554,28 +578,70 @@ helpdesk.ragosa.tech@gmail.com
 +234 813 887 9938
 """
 
-        # Handle optional attachment
+        # Handle attachment
         reply_attachment_path = None
+        attachment_filename = None
         if form.attachment.data:
-            # Save the admin's reply attachment with a meaningful name
             filename = secure_filename(form.attachment.data.filename)
             safe_name = f"reply-{req.reference_id}-{filename}"
             reply_attachment_path = os.path.join(app.config['UPLOAD_FOLDER'], safe_name)
             form.attachment.data.save(reply_attachment_path)
+            attachment_filename = safe_name
 
-        # Send the email with possible attachment
+        # Parse CC emails (comma-separated)
+        cc_list = []
+        cc_string_for_db = None
+        if form.cc_email.data and form.cc_email.data.strip():
+            # Split by comma, strip whitespace, filter valid-looking emails
+            raw_emails = [email.strip() for email in form.cc_email.data.split(',') if email.strip()]
+            # Basic validation: must contain @ and a dot after it
+            cc_list = [email for email in raw_emails if '@' in email and '.' in email.split('@')[-1]]
+            if cc_list:
+                cc_string_for_db = ', '.join(cc_list)
+
+        # Send email (with CC if any)
         send_email(
-            req.email,
-            reply_subject,
+            to_email=req.email,
+            subject=reply_subject,
             plain_body=plain_body,
             html_body=html_body,
-            attachment_path=reply_attachment_path  # attach admin's file if uploaded
+            attachment_path=reply_attachment_path,
+            cc=cc_list if cc_list else None
         )
 
+        # Save reply with CC logging
+        new_reply = ClientReply(
+            request_id=req.id,
+            subject=reply_subject,
+            message=form.message.data,
+            attachment=attachment_filename,
+            sent_by_id=current_user.id,
+            cc_recipients=cc_string_for_db  # saved as comma-separated string
+        )
+        db.session.add(new_reply)
+        db.session.commit()
+
         flash(f"Reply sent successfully to {req.email} (Ticket ID: {req.reference_id}).", "success")
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('view_conversation', request_id=req.id))
 
     return render_template("reply_client.html", form=form, request=req)
+
+@app.route('/conversation/<int:request_id>')
+@login_required
+@role_required('superadmin', 'admin', 'team')
+def view_conversation(request_id):
+    req = POCRequest.query.get_or_404(request_id)
+    
+    # Get replies, newest first
+    replies = ClientReply.query.filter_by(request_id=req.id)\
+                              .order_by(ClientReply.sent_at.desc())\
+                              .all()
+    
+    return render_template(
+        'conversation.html',
+        request=req,
+        replies=replies
+    )
 
 def generate_ics_file(request_obj):
     os.makedirs(app.static_folder, exist_ok=True)
@@ -666,14 +732,19 @@ def home():
 def admin_login():
     if current_user.is_authenticated:
         return redirect(url_for('dashboard'))
-   
+  
     form = AdminLoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data.strip()).first()
+        # Search for user by username OR email (email is case-insensitive)
+        user = User.query.filter(
+            (User.username == form.username.data.strip()) |
+            (User.email == form.username.data.strip().lower())
+        ).first()
+
         if not user or not user.check_password(form.password.data):
-            flash("Invalid username or password.", "danger")
+            flash("Invalid username/email or password.", "danger")
             return render_template("admin_login.html", form=form)
-        
+       
         # Generate OTP
         code = ''.join(random.choices(string.digits, k=6))
         otp = OTPCode(
@@ -697,22 +768,40 @@ def admin_login():
                 body {{ font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; background: #f6f9fc; }}
                 .container {{ max-width: 620px; margin: 40px auto; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 12px 50px rgba(0,0,0,0.15); }}
                 .header {{ background: linear-gradient(135deg, #001f3f, #003366); color: white; padding: 70px 50px 60px; text-align: center; }}
-                .header h1 {{ margin: 0; font-size: 36px; letter-spacing: 1px; }}
+                .header h1 {{ margin: 0; font-size: 30px; letter-spacing: 1px; }}
                 .content {{ padding: 50px 50px 60px; color: #333; line-height: 1.8; }}
                 .otp-box {{
-                    font-size: 52px; font-weight: 800; letter-spacing: 16px; color: #60a5fa;
+                    font-size: 32px; font-weight: 800; letter-spacing: 16px; color: #60a5fa;
                     background: #f0f7ff; padding: 28px; text-align: center; border-radius: 16px;
                     margin: 40px 0; box-shadow: inset 0 4px 15px rgba(96,165,250,0.15);
                 }}
                 .btn {{
                     display: inline-block; background: linear-gradient(90deg, #007BFF, #0056b3);
                     color: white !important; padding: 16px 60px; text-decoration: none;
-                    border-radius: 50px; font-size: 20px; font-weight: 600; margin: 35px 0;
+                    border-radius: 50px; font-size: 16px; font-weight: 600; margin: 35px 0;
                     box-shadow: 0 8px 25px rgba(0,123,255,0.35); transition: all 0.3s;
                 }}
                 .btn:hover {{ transform: translateY(-3px); box-shadow: 0 12px 35px rgba(0,123,255,0.5); }}
                 .footer {{ background: #001f3f; color: #cbd5e1; padding: 35px; text-align: center; font-size: 14px; }}
                 .highlight {{ color: #93c5fd; font-weight: 600; }}
+                
+                @media only screen and (max-width: 600px) {{
+                    body, p, div {{ font-size: 15px !important; line-height: 1.6 !important; }}
+                    h1 {{ font-size: 24px !important; }}
+                    .otp-box {{
+                        font-size: 16px !important;
+                        letter-spacing: 5px !important;
+                        padding: 20px !important;
+                        margin: 30px 0 !important;
+                    }}
+                    .btn {{ font-size: 16px !important; padding: 12px 40px !important; }}
+                    .content {{ padding: 30px 20px !important; }}
+                    .header {{ padding: 50px 20px 40px !important; }}
+                    .footer {{ font-size: 13px !important; padding: 25px !important; }}
+                }}
+                @media only screen and (max-width: 400px) {{
+                    .otp-box {{ font-size: 16px !important; letter-spacing: 4px !important; }}
+                }}
             </style>
         </head>
         <body>
@@ -721,7 +810,7 @@ def admin_login():
                     <h1>Secure Login Verification</h1>
                 </div>
                 <div class="content">
-                    <p>Hello <strong>{user.username}</strong>,</p>
+                    <p>Hello <strong>{user.full_name}</strong>,</p>
                     <p>We received a login request to your Rago Admin account. Use the code below to continue:</p>
                     <div class="otp-box">{code}</div>
                     <p>This code is valid for <strong>10 minutes</strong>. Do not share it with anyone.</p>
@@ -740,7 +829,6 @@ def admin_login():
         </body>
         </html>
         """
-
         send_email(
             user.email,
             otp_subject,
@@ -751,7 +839,6 @@ def admin_login():
         # Store user ID and remember choice
         session['pending_user_id'] = user.id
         session['remember'] = form.remember.data
-
         flash("A 6-digit verification code has been sent to your email.", "info")
         return redirect(url_for('verify_2fa'))
 
@@ -1620,6 +1707,24 @@ def follow_up():
                         .otp-box {{ font-size: 48px; font-weight: bold; letter-spacing: 12px; color: #007BFF; background: #f0f7ff; padding: 20px; text-align: center; border-radius: 12px; margin: 30px 0; box-shadow: inset 0 2px 10px rgba(0,123,255,0.1); }}
                         .btn {{ display: inline-block; background: #007BFF; color: white !important; padding: 14px 40px; text-decoration: none; border-radius: 50px; font-size: 18px; margin: 30px 0; }}
                         .footer {{ background: #001f3f; color: white; padding: 30px; text-align: center; font-size: 14px; }}
+                            @media only screen and (max-width: 600px) {{
+                            body, p, div {{ font-size: 15px !important; line-height: 1.6 !important; }}
+                            h1 {{ font-size: 24px !important; }}
+                            .otp-box {{
+                                font-size: 36px !important;
+                                letter-spacing: 10px !important;
+                                padding: 20px !important;
+                                margin: 30px 0 !important;
+                            }}
+                            .btn {{ font-size: 16px !important; padding: 12px 40px !important; }}
+                            .content {{ padding: 30px 20px !important; }}
+                            .header {{ padding: 50px 20px 40px !important; }}
+                            .footer {{ font-size: 13px !important; padding: 25px !important; }}
+                        }}
+                        @media only screen and (max-width: 400px) {{
+                            .otp-box {{ font-size: 32px !important; letter-spacing: 8px !important; }}
+                        }}
+                    
                     </style>
                 </head>
                 <body>
@@ -1697,6 +1802,24 @@ def follow_up():
                             .otp-box {{ font-size: 48px; font-weight: bold; letter-spacing: 12px; color: #007BFF; background: #f0f7ff; padding: 20px; text-align: center; border-radius: 12px; margin: 30px 0; box-shadow: inset 0 2px 10px rgba(0,123,255,0.1); }}
                             .btn {{ display: inline-block; background: #007BFF; color: white !important; padding: 14px 40px; text-decoration: none; border-radius: 50px; font-size: 18px; margin: 30px 0; }}
                             .footer {{ background: #001f3f; color: white; padding: 30px; text-align: center; font-size: 14px; }}
+                        
+                            @media only screen and (max-width: 600px) {{
+                                body, p, div {{ font-size: 15px !important; line-height: 1.6 !important; }}
+                                h1 {{ font-size: 24px !important; }}
+                                .otp-box {{
+                                    font-size: 36px !important;
+                                    letter-spacing: 10px !important;
+                                    padding: 20px !important;
+                                    margin: 30px 0 !important;
+                                }}
+                                .btn {{ font-size: 16px !important; padding: 12px 40px !important; }}
+                                .content {{ padding: 30px 20px !important; }}
+                                .header {{ padding: 50px 20px 40px !important; }}
+                                .footer {{ font-size: 13px !important; padding: 25px !important; }}
+                            }}
+                            @media only screen and (max-width: 400px) {{
+                                .otp-box {{ font-size: 32px !important; letter-spacing: 8px !important; }}
+                            }}
                         </style>
                     </head>
                     <body>
@@ -1735,7 +1858,7 @@ def follow_up():
                     session['followup_ref'] = ref_input
                     session['followup_email'] = email
                     session['followup_otp_id'] = otp_record.id
-                    flash(f"A 6-digit verification code has been sent to {email}. Please check your inbox (and spam folder).", "info")
+                    flash(f"A 6-digit verification code has been sent to your email. Please check your inbox (and spam folder).", "info")
                     return redirect(url_for('follow_up'))
 
         # ── 2. Verify OTP ───────────────────────────────────────────────
@@ -2061,22 +2184,33 @@ PROTECTED_SUPERADMIN_USERNAME = "admin"  # change if needed
 def edit_user(user_id):
     user = User.query.get_or_404(user_id)
 
-    # Prevent editing own profile (both admin and superadmin)
-    if user.id == current_user.id:
-        flash("You cannot edit your own profile. Contact System Administrator", "warning")
-        return redirect(url_for('manage_users'))
-
-    # Protected primary superadmin account
-    is_protected_superadmin = (user.username == PROTECTED_SUPERADMIN_USERNAME)
-
-    # Superadmin profiles are completely locked — no one except possibly self (but self is blocked above)
-    if user.role == 'superadmin':
-        flash("Super Admin accounts cannot be edited.", "danger")
-        return redirect(url_for('manage_users'))
-
-    # Admins can only reset password and change role (no profile fields)
+    # Define these at function scope so they're always available
     is_admin = (current_user.role == 'admin')
+    is_superadmin = (current_user.role == 'superadmin')
 
+    # Determine if this is a self-edit attempt
+    is_self_edit = (user.id == current_user.id)
+
+    # ── Access control: who can edit whom ───────────────────────────────────────
+    if is_self_edit:
+        # Only superadmin is allowed to edit themselves
+        if not is_superadmin:
+            flash("You are not allowed to edit your own profile.", "warning")
+            return redirect(url_for('manage_users'))
+        # Superadmin → allowed to edit self
+    else:
+        # Editing someone else
+        # Protect the primary (hardcoded) superadmin account from everyone
+        if user.username == PROTECTED_SUPERADMIN_USERNAME:
+            flash("This is the primary system owner account and cannot be edited.", "danger")
+            return redirect(url_for('manage_users'))
+
+        # Only superadmin can edit other superadmin accounts
+        if user.role == 'superadmin' and not is_superadmin:
+            flash("Only superadmin can edit other superadmin accounts.", "danger")
+            return redirect(url_for('manage_users'))
+
+    # ── Form setup ──────────────────────────────────────────────────────────────
     form = EditUserForm(user_id=user.id)
 
     if request.method == 'GET':
@@ -2086,14 +2220,16 @@ def edit_user(user_id):
         form.role.data = user.role
 
     if form.validate_on_submit():
-        if not is_admin:
-            # Superadmin can edit everything (except superadmin profiles — already blocked)
+        # Username, full_name, email → superadmin only (or self if superadmin)
+        if is_superadmin:
             user.username = form.username.data.strip()
             user.full_name = form.full_name.data.strip() or None
             user.email = form.email.data.strip().lower()
 
-        # Role change: superadmin only (admins can also change role of non-superadmin users)
-        if current_user.role == 'superadmin' or (is_admin and user.role != 'superadmin'):
+        # Role change:
+        # - Superadmin can change anyone's role
+        # - Admin can change role of non-superadmin users
+        if is_superadmin or (is_admin and user.role != 'superadmin'):
             user.role = form.role.data.strip()
 
         # Password reset: allowed for both admin and superadmin
@@ -2104,7 +2240,15 @@ def edit_user(user_id):
         flash(f"User '{user.username}' updated successfully.", "success")
         return redirect(url_for('manage_users'))
 
-    return render_template('admin_user_form.html', form=form, title="Edit User", user=user, is_admin=is_admin)
+    # ── Render form ─────────────────────────────────────────────────────────────
+    return render_template(
+        'admin_user_form.html',
+        form=form,
+        title="Edit User",
+        user=user,
+        is_admin=is_admin,
+        is_self_edit=is_self_edit  # optional: pass if you want conditional UI
+    )
 
 
 @app.route('/admin/users/delete/<int:user_id>', methods=['POST'])

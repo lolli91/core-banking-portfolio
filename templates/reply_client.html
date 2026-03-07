@@ -101,9 +101,21 @@
 
                     <div class="mb-4">
                         {{ form.message.label(class="form-label") }}
-                        {{ form.message(class="form-control", rows=5, placeholder="Write your reply here... Type clearly and professionally.") }}
+                        {{ form.message(class="form-control", rows=6, placeholder="Write your reply here... Type clearly and professionally.") }}
                         {% if form.message.errors %}
                             <div class="text-danger small mt-1">{{ form.message.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- New CC Field -->
+                    <div class="mb-4">
+                        {{ form.cc_email.label(class="form-label") }}
+                        {{ form.cc_email(class="form-control", placeholder="e.g. team@company.com (optional)") }}
+                        <small class="form-text form-text-small">
+                            Optional: Enter email address(es) to CC on this reply. Separate multiple with commas if needed.
+                        </small>
+                        {% if form.cc_email.errors %}
+                            <div class="text-danger small mt-1">{{ form.cc_email.errors[0] }}</div>
                         {% endif %}
                     </div>
 
@@ -111,7 +123,7 @@
                         {{ form.attachment.label(class="form-label") }}
                         {{ form.attachment(class="form-control") }}
                         <small class="form-text form-text-small">
-                            Optional: Attach supporting files (PDF, Word, Images, ZIP). Max size recommended: 10MB.
+                            Optional: Attach supporting files (PDF, Word, Excel, Images, ZIP). Max size recommended: 10MB.
                         </small>
                         {% if form.attachment.errors %}
                             <div class="text-danger small mt-1">{{ form.attachment.errors[0] }}</div>
